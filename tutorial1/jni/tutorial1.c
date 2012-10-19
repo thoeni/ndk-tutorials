@@ -22,8 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <pthread.h>
 
 #define  LOG_TAG    "tutorial1"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -83,7 +81,5 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
         LOGE("Failed to get the environment using GetEnv()");
         return -1;
     }
-//    jclass localClass = env->FindClass("MyClass");
-//    jclass globalClass = reinterpret_cast<jclass>(env->NewGlobalRef(localClass));
     return JNI_VERSION_1_4;
 }

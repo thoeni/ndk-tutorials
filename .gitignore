@@ -11,3 +11,16 @@ tutorial1/res/drawable-hdpi/
 tutorial1/res/drawable-ldpi/
 tutorial1/res/drawable-mdpi/
 tutorial1/res/drawable-xhdpi/
+tutorial2/.classpath
+tutorial2/.project
+tutorial2/bin/
+tutorial2/build.xml
+tutorial2/gen/
+tutorial2/libs/
+tutorial2/local.properties
+tutorial2/obj/
+tutorial2/proguard-project.txt
+tutorial2/res/drawable-hdpi/
+tutorial2/res/drawable-ldpi/
+tutorial2/res/drawable-mdpi/
+tutorial2/res/drawable-xhdpi/

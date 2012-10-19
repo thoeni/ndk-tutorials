@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">Tutorial2Activity</string>
+  <string name="button0">Start the random routine</string>
+  <string name="button1">Stop the random routine</string>
+</resources>
