@@ -1,0 +1,13 @@
+tutorial1/.classpath
+tutorial1/.project
+tutorial1/bin/
+tutorial1/build.xml
+tutorial1/gen/
+tutorial1/libs/
+tutorial1/local.properties
+tutorial1/obj/
+tutorial1/proguard-project.txt
+tutorial1/res/drawable-hdpi/
+tutorial1/res/drawable-ldpi/
+tutorial1/res/drawable-mdpi/
+tutorial1/res/drawable-xhdpi/

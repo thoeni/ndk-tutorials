@@ -1,0 +1,23 @@
+Tutorials to explore JNI calls into Android environment, through the ndk development kit.
+
+How to make it work:
+
+0- Clone the tutorials into your <ndk-root> folder
+
+1- Create a new project in Eclipse from the existing sample source
+In Eclipse:
+Click File > New Android Project...
+Select the Create project from existing source radio button.
+Select any API level above Android 1.5.
+In the Location field, click Browse... and select the proper tutorialX directory.
+Click Finish.
+
+2- On the command line:
+Change to the <ndk-root>/tutorials/tutorialX directory.
+Run the following command to generate a build.xml file:
+android update project -p .
+Compile the native code using the ndk-build command.
+cd <ndk-root>/tutorials/tutorialX
+<ndk_root>/ndk-build
+
+4- In Eclipse: after you launched the emulator, run project as Android Application
