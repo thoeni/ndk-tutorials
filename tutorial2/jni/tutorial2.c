@@ -117,6 +117,8 @@ void daemonStart() {
 //	//randomize callbacks
 //	}
 	callStaticVoidMethodWrapper(methodID[1]);
+	sleep(1);
+	callStaticVoidMethodWrapper(methodID[0]);
 }
 
 void
