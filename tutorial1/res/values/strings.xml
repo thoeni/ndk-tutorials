@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">BbqueActivity</string>
+  <string name="button0">Call to native</string>
+  <string name="button1">Callback trigger</string>
+</resources>
