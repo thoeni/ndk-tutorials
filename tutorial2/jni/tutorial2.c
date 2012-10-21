@@ -145,7 +145,7 @@ int callStaticMethodWrapper(int id, params_t *par) {
 			LOGE("Invalid java version");
 		break;
 	}
-	LOGI("Calling: %s with signature %s and params %d and %d.", cb[id].cbName, cb[id].cbSignature, par[0].p_int, par[1].p_int);
+	LOGI("Calling: %s with signature %s and params %d and %d.", cb[id].cbName, cb[id].cbSignature);
 	switch (cb[id].jniWrapper) {
 	  //
 	  case JNI_WRAPPER_rVOID_pVOID:
