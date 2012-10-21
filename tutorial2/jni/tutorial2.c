@@ -31,9 +31,20 @@ static JavaVM *gJavaVM;
 static jobject gInterfaceObject, gDataObject;
 static jclass gClass;
 
+
+/*
+ * The enum below is used to switch between the various callback functions.
+ * Basically the callback will depend on the return type rTYPE and on the presence
+ * or absence of parameters. In case of parameters presence, a proper jvalue array
+ * will be used.
+ */
 typedef enum {
-  JNI_WRAPPER_rVOID_pVOID = 0,
-  JNI_WRAPPER_rINT_pVOID = 1,
+  JNI_WRAPPER_rVOID = 0,
+  JNI_WRAPPER_rVOID_p = 1,
+  JNI_WRAPPER_rINT = 2,
+  JNI_WRAPPER_rINT_p = 3,
+  JNI_WRAPPER_rFLOAT = 4,
+  JNI_WRAPPER_rFLOAT_p = 5
 } jniWrapper_t;
 
 typedef struct {
@@ -41,25 +52,22 @@ typedef struct {
     const char* cbSignature;
     jniWrapper_t jniWrapper;
     jmethodID cbMethod;
+    jvalue cbParams[];
 } callback_t;
 
 /*
  * Declaration of callbacks methods, with regard to the callback_t structure:
  */
 callback_t cb[] = {
-  // callback1 [0]
+  // cb[0]
   {
-    "callback1", "()V", JNI_WRAPPER_rVOID_pVOID,
+    "callback1", "()V", JNI_WRAPPER_rVOID,
   },
-  // callback2 [1]
+  // cb[1]
   {
-    "callback2", "()V", JNI_WRAPPER_rVOID_pVOID,
+    "callback2", "(I)I", JNI_WRAPPER_rINT_p,
   },
 };
-
-const char method[2][10] = {"callback1", "callback2"};
-
-jmethodID methodID[2];
 
 int flag = 1;
 
@@ -102,11 +110,11 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 	if(!cb)
 		goto failure;
 
-	int length = sizeof cb / sizeof cb[0];;
-	while(length--) {
-		LOGI("Method %d %s", length, cb[length].cbName);
-		cb[length].cbMethod = (*env)->GetStaticMethodID(env, clazz, cb[length].cbName, cb[length].cbSignature);
-		if(!cb[length].cbMethod) {
+	int i = sizeof cb / sizeof cb[0];
+	while(i--) {
+		LOGI("Method %d is %s with signature %s", i, cb[i].cbName, cb[i].cbSignature);
+		cb[i].cbMethod = (*env)->GetStaticMethodID(env, clazz, cb[i].cbName, cb[i].cbSignature);
+		if(!cb[i].cbMethod) {
 			LOGE("callback_handler: failed to get method ID");
 			goto failure;
 		}
@@ -131,14 +139,26 @@ int callStaticMethodWrapper(callback_t cb) {
 		}
 		isAttached = 1;
 	}
-	LOGI("Entering the switch for cb method %s with signature %s, case %d", cb.cbName, cb.cbSignature, cb.jniWrapper);
+	//LOGI("Entering the switch for cb method %s with signature %s, case %d", cb.cbName, cb.cbSignature, cb.jniWrapper);
 	switch (cb.jniWrapper) {
 	  //
-	  case JNI_WRAPPER_rVOID_pVOID:
+	  case JNI_WRAPPER_rVOID:
 		  (*env)->CallStaticVoidMethod(env, gClass, cb.cbMethod);
 	  break;
-	  case JNI_WRAPPER_rINT_pVOID:
-	    (*env)->CallStaticIntMethod(env, gClass, cb.cbMethod);
+	  case JNI_WRAPPER_rVOID_p:
+		  (*env)->CallStaticVoidMethodA(env, gClass, cb.cbMethod, cb.cbParams);
+	  break;
+	  case JNI_WRAPPER_rINT:
+		  (*env)->CallStaticIntMethod(env, gClass, cb.cbMethod);
+	  break;
+	  case JNI_WRAPPER_rINT_p:
+		  (*env)->CallStaticIntMethodA(env, gClass, cb.cbMethod, cb.cbParams);
+	  break;
+	  case JNI_WRAPPER_rFLOAT:
+		  (*env)->CallStaticFloatMethod(env, gClass, cb.cbMethod);
+	  break;
+	  case JNI_WRAPPER_rFLOAT_p:
+		  (*env)->CallStaticFloatMethodA(env, gClass, cb.cbMethod, cb.cbParams);
 	  break;
 	}
 	if(isAttached)
@@ -149,10 +169,8 @@ int callStaticMethodWrapper(callback_t cb) {
 void daemonStart() {
 	LOGI("daemonStart called!");
 	flag = 1;
-//	while(flag) {
-//	//randomize callbacks
-//	}
-	callStaticMethodWrapper(cb[0]);
+	cb[1].cbParams[0].i = 75;
+	callStaticMethodWrapper(cb[1]);
 }
 
 void
