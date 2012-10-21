@@ -31,6 +31,32 @@ static JavaVM *gJavaVM;
 static jobject gInterfaceObject, gDataObject;
 static jclass gClass;
 
+typedef enum {
+  JNI_WRAPPER_rVOID_pVOID = 0,
+  JNI_WRAPPER_rINT_pVOID = 1,
+} jniWrapper_t;
+
+typedef struct {
+    const char* cbName;
+    const char* cbSignature;
+    jniWrapper_t jniWrapper;
+    jmethodID cbMethod;
+} callback_t;
+
+/*
+ * Declaration of callbacks methods, with regard to the callback_t structure:
+ */
+callback_t cb[] = {
+  // callback1 [0]
+  {
+    "callback1", "()V", JNI_WRAPPER_rVOID_pVOID,
+  },
+  // callback2 [1]
+  {
+    "callback2", "()V", JNI_WRAPPER_rVOID_pVOID,
+  },
+};
+
 const char method[2][10] = {"callback1", "callback2"};
 
 jmethodID methodID[2];
@@ -72,16 +98,17 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 		goto failure;
 	}
 
-//	jmethodID method = (*env)->GetStaticMethodID(env, clazz, "foo3Callback", "()V");
-	if(method != NULL) {
-		int length = 2;
-		while(length--) {
-			LOGI("Method %d %s", length, method[length]);
-			methodID[length] = (*env)->GetStaticMethodID(env, clazz, method[length], "()V");
-			if(!methodID[length]) {
-				LOGE("callback_handler: failed to get method ID");
-				goto failure;
-			}
+	//The following cycle will resolve all the methodIDs declared in the cb[] array
+	if(!cb)
+		goto failure;
+
+	int length = sizeof cb / sizeof cb[0];;
+	while(length--) {
+		LOGI("Method %d %s", length, cb[length].cbName);
+		cb[length].cbMethod = (*env)->GetStaticMethodID(env, clazz, cb[length].cbName, cb[length].cbSignature);
+		if(!cb[length].cbMethod) {
+			LOGE("callback_handler: failed to get method ID");
+			goto failure;
 		}
 	}
 
@@ -90,8 +117,8 @@ failure:
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 }
 
-int callStaticVoidMethodWrapper(jmethodID properMethodID) {
-	LOGI("callStaticVoidMethodWrapper called!");
+int callStaticMethodWrapper(callback_t cb) {
+	LOGI("callStaticMethodWrapper called!");
 	JNIEnv *env;
 	int isAttached = 0;
 	int status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
@@ -104,7 +131,16 @@ int callStaticVoidMethodWrapper(jmethodID properMethodID) {
 		}
 		isAttached = 1;
 	}
-	(*env)->CallStaticVoidMethod(env, gClass, properMethodID);
+	LOGI("Entering the switch for cb method %s with signature %s, case %d", cb.cbName, cb.cbSignature, cb.jniWrapper);
+	switch (cb.jniWrapper) {
+	  //
+	  case JNI_WRAPPER_rVOID_pVOID:
+		  (*env)->CallStaticVoidMethod(env, gClass, cb.cbMethod);
+	  break;
+	  case JNI_WRAPPER_rINT_pVOID:
+	    (*env)->CallStaticIntMethod(env, gClass, cb.cbMethod);
+	  break;
+	}
 	if(isAttached)
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 	return 0;
@@ -116,9 +152,7 @@ void daemonStart() {
 //	while(flag) {
 //	//randomize callbacks
 //	}
-	callStaticVoidMethodWrapper(methodID[1]);
-	sleep(1);
-	callStaticVoidMethodWrapper(methodID[0]);
+	callStaticMethodWrapper(cb[0]);
 }
 
 void
