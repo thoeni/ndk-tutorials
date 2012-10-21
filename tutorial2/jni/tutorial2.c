@@ -33,33 +33,41 @@ static jclass gClass;
 
 typedef enum {
   JNI_WRAPPER_rVOID_pVOID = 0,
-  JNI_WRAPPER_rINT_pVOID = 1,
+  JNI_WRAPPER_rVOID_pINT = 1,
+  JNI_WRAPPER_rVOID_pINT_pINT = 2,
 } jniWrapper_t;
+
+typedef struct {
+	int p_int;
+	float p_float;
+	char* p_string;
+} params_t;
 
 typedef struct {
     const char* cbName;
     const char* cbSignature;
     jniWrapper_t jniWrapper;
     jmethodID cbMethod;
+//  params_t cbParams[];
 } callback_t;
 
 /*
  * Declaration of callbacks methods, with regard to the callback_t structure:
  */
 callback_t cb[] = {
-  // callback1 [0]
-  {
-    "callback1", "()V", JNI_WRAPPER_rVOID_pVOID,
-  },
-  // callback2 [1]
-  {
-    "callback2", "()V", JNI_WRAPPER_rVOID_pVOID,
-  },
+	// callback1 [0]
+	{
+			"callback1", "()V", JNI_WRAPPER_rVOID_pVOID,
+	},
+	// callback2 [1]
+	{
+			"callback2", "(I)V", JNI_WRAPPER_rVOID_pINT,
+	},
+	// callback3 [2]
+	{
+			"callback3", "(II)V", JNI_WRAPPER_rVOID_pINT_pINT,
+	},
 };
-
-const char method[2][10] = {"callback1", "callback2"};
-
-jmethodID methodID[2];
 
 int flag = 1;
 
@@ -81,7 +89,9 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 	LOGI("init called!");
 	int status;
 	int isAttached = 0;
+	//GetEnv tells whether the thread is already attached to the VM
 	status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
+	LOGI("GetEnv status is: %d", status);
 	if(status < 0) {
 		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
 		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
@@ -97,9 +107,8 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 		LOGE("callback_handler: failed to get object Class");
 		goto failure;
 	}
-
 	//The following cycle will resolve all the methodIDs declared in the cb[] array
-	if(!cb)
+	if(cb == NULL)
 		goto failure;
 
 	int length = sizeof cb / sizeof cb[0];;
@@ -113,35 +122,43 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 	}
 
 failure:
-	if(isAttached)
+	if(isAttached == 1)
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 }
 
-int callStaticMethodWrapper(callback_t cb) {
+int callStaticMethodWrapper(int id, params_t *par) {
 	LOGI("callStaticMethodWrapper called!");
 	JNIEnv *env;
 	int isAttached = 0;
-	int status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
-	if(status < 0) {
-		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
-		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
-		if(status < 0) {
-			LOGE("callback_handler: failed to attach current thread");
-			return -1;
-		}
-		isAttached = 1;
+	switch ((*gJavaVM)->GetEnv(gJavaVM, (void**)&env, JNI_VERSION_1_4))
+	{
+		case JNI_OK:
+		break;
+		case JNI_EDETACHED:
+			if ((*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL)!=0)
+			{
+			  LOGE("Could not attach current thread");
+			}
+			isAttached = 1;
+		break;
+		case JNI_EVERSION:
+			LOGE("Invalid java version");
+		break;
 	}
-	LOGI("Entering the switch for cb method %s with signature %s, case %d", cb.cbName, cb.cbSignature, cb.jniWrapper);
-	switch (cb.jniWrapper) {
+	LOGI("Calling: %s with signature %s and params %d and %d.", cb[id].cbName, cb[id].cbSignature, par[0].p_int, par[1].p_int);
+	switch (cb[id].jniWrapper) {
 	  //
 	  case JNI_WRAPPER_rVOID_pVOID:
-		  (*env)->CallStaticVoidMethod(env, gClass, cb.cbMethod);
+		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod);
 	  break;
-	  case JNI_WRAPPER_rINT_pVOID:
-	    (*env)->CallStaticIntMethod(env, gClass, cb.cbMethod);
+	  case JNI_WRAPPER_rVOID_pINT:
+	      (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, par[0].p_int);
+	  break;
+	  case JNI_WRAPPER_rVOID_pINT_pINT:
+		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, par[0].p_int, par[1].p_int);
 	  break;
 	}
-	if(isAttached)
+	if (isAttached == 1)
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 	return 0;
 }
@@ -149,10 +166,13 @@ int callStaticMethodWrapper(callback_t cb) {
 void daemonStart() {
 	LOGI("daemonStart called!");
 	flag = 1;
-//	while(flag) {
-//	//randomize callbacks
-//	}
-	callStaticMethodWrapper(cb[0]);
+	params_t params[1];
+	params[0].p_int = 56;
+//	params[1].p_int = 21;
+	/*
+	 * The callStaticMethodWrapper takes (methodID, params)
+	 */
+	callStaticMethodWrapper(1, params);
 }
 
 void
