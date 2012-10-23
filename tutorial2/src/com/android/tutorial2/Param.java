@@ -2,11 +2,12 @@ package com.android.tutorial2;
 
 public class Param {
 	private int[] iParams;
-	private long[] lParams;
+	private float[] fParams;
 	private String[] sParams;
 	
-	public Param(int[] iP) {
+	public Param(int[] iP, float[] fP) {
 		setiParams(iP);
+		setfParams(fP);
 	}
 	
 	public int[] getiParams() {
@@ -15,16 +16,17 @@ public class Param {
 	public void setiParams(int[] iParams) {
 		this.iParams = iParams;
 	}
-	public long[] getlParams() {
-		return lParams;
-	}
-	public void setlParams(long[] lParams) {
-		this.lParams = lParams;
-	}
 	public String[] getsParams() {
 		return sParams;
 	}
 	public void setsParams(String[] sParams) {
 		this.sParams = sParams;
+	}
+
+	public float[] getfParams() {
+		return fParams;
+	}
+	public void setfParams(float[] fParams) {
+		this.fParams = fParams;
 	}
 }
