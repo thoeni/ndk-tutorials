@@ -144,7 +144,6 @@ int callStaticMethodWrapper(int id, jint ipar[], int isize, jfloat fpar[], int f
 	jclass cls;
 	jintArray iarr;
 	jfloatArray farr;
-	jclass strArrCls;
 	jmethodID constructor;
 	jobject obj;
 	jobjectArray sarr;
@@ -186,10 +185,7 @@ int callStaticMethodWrapper(int id, jint ipar[], int isize, jfloat fpar[], int f
 		  //Fill the array with the float input parameter
 		  (*env)->SetFloatArrayRegion(env, farr, 0, fsize, fpar);
 		  //###Create a new Array of Strings###
-		  //1) Find the String object class
-		  strArrCls = (*env)->FindClass(env, "java/lang/String");
-		  //2) Create the array of String objects:
-		  sarr = (*env)->NewObjectArray(env, ssize, strArrCls, NULL);
+		  sarr = (*env)->NewObjectArray(env, ssize, (*env)->FindClass(env, "java/lang/String"), NULL);
 		  for (i=0; i<ssize; i++)
 			  (*env)->SetObjectArrayElement(env, sarr, i, (*env)->NewStringUTF(env, spar[i]));
 
