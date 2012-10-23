@@ -5,9 +5,10 @@ public class Param {
 	private float[] fParams;
 	private String[] sParams;
 	
-	public Param(int[] iP, float[] fP) {
+	public Param(int[] iP, float[] fP, String[] sP) {
 		setiParams(iP);
 		setfParams(fP);
+		setsParams(sP);
 	}
 	
 	public int[] getiParams() {

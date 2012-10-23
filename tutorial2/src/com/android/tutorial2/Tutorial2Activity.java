@@ -80,7 +80,8 @@ public class Tutorial2Activity extends Activity implements Runnable {
   
   public static void callbackObject(Param parameters) {
 	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("callbackObj: int: "+parameters.getiParams()[0]+", "+parameters.getiParams()[1]+" float: "+parameters.getfParams()[0]+" "+parameters.getfParams()[1]);
+//	  output.setText("callbackObj: i: "+parameters.getiParams()[0]+", "+parameters.getiParams()[1]+" f: "+parameters.getfParams()[0]+" "+parameters.getfParams()[1]);
+	  output.setText("callbackObj: i: "+parameters.getiParams()[0]+", "+parameters.getiParams()[1]+" f: "+parameters.getfParams()[0]+" "+parameters.getfParams()[1]+" s: "+parameters.getsParams()[0]+" "+parameters.getsParams()[1]);
 //	  float[] fParams = (float[])parameters[1];
 //	  String[] sParams = (String[])parameters[2];
   }

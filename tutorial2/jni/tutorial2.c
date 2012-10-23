@@ -50,7 +50,6 @@ typedef struct {
     const char* cbSignature;
     jniWrapper_t jniWrapper;
     jmethodID cbMethod;
-//  params_t cbParams[];
     jintArray inta;
 } callback_t;
 
@@ -137,7 +136,7 @@ failure:
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 }
 
-int callStaticMethodWrapper(int id, jint ipar[], int isize, jfloat fpar[], int fsize) {
+int callStaticMethodWrapper(int id, jint ipar[], int isize, jfloat fpar[], int fsize, char* spar[], int ssize) {
 	LOGI("callStaticMethodWrapper called!");
 	JNIEnv *env;
 	int isAttached = 0;
@@ -145,8 +144,11 @@ int callStaticMethodWrapper(int id, jint ipar[], int isize, jfloat fpar[], int f
 	jclass cls;
 	jintArray iarr;
 	jfloatArray farr;
+	jclass strArrCls;
 	jmethodID constructor;
 	jobject obj;
+	jobjectArray sarr;
+	int i=0;
 	switch ((*gJavaVM)->GetEnv(gJavaVM, (void**)&env, JNI_VERSION_1_4))
 	{
 		case JNI_OK:
@@ -175,18 +177,26 @@ int callStaticMethodWrapper(int id, jint ipar[], int isize, jfloat fpar[], int f
 	  case JNI_WRAPPER_rVOID_pOBJ:
 		  //Find the "Param" Class
 		  cls = (*env)->FindClass(env, "com/android/tutorial2/Param");
-		  //Create a new Array of integers
+		  //###Create a new Array of integers###
 		  iarr = (*env)->NewIntArray(env, isize);
 		  //Fill the array with the integer input parameter
 		  (*env)->SetIntArrayRegion(env, iarr, 0, isize, ipar);
-		  //Create a new Array of floats
+		  //###Create a new Array of floats###
 		  farr = (*env)->NewIntArray(env, fsize);
 		  //Fill the array with the float input parameter
 		  (*env)->SetFloatArrayRegion(env, farr, 0, fsize, fpar);
+		  //###Create a new Array of Strings###
+		  //1) Find the String object class
+		  strArrCls = (*env)->FindClass(env, "java/lang/String");
+		  //2) Create the array of String objects:
+		  sarr = (*env)->NewObjectArray(env, ssize, strArrCls, NULL);
+		  for (i=0; i<ssize; i++)
+			  (*env)->SetObjectArrayElement(env, sarr, i, (*env)->NewStringUTF(env, spar[i]));
+
 		  //Find the constructor of the Param object, which takes as parameter an int array and a float array
-		  constructor = (*env)->GetMethodID(env, cls, "<init>", "([I[F)V");
+		  constructor = (*env)->GetMethodID(env, cls, "<init>", "([I[F[Ljava/lang/String;)V");
 		  //Create the Object with its constructor, and the arrays as parameters
-		  obj = (*env)->NewObject(env, cls, constructor, iarr, farr);
+		  obj = (*env)->NewObject(env, cls, constructor, iarr, farr, sarr);
 		  //Call the callback method passing the object as input parameter
 		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, obj);
 	  	  LOGI("OK");
@@ -202,7 +212,9 @@ void daemonStart() {
 	flag = 1;
 	jint iparams[2] = {0, 1};
 	jfloat fparams[2] = {1.2, 3.2};
-	callStaticMethodWrapper(4, iparams, 2, fparams, 2);
+	char* sparams[2] = {"ab","cd"};
+	//callStaticMethodWrapper(method-to-be-called, intArray, intArray-size, floatArray, floatArray-size, stringArray, stringArray-size)
+	callStaticMethodWrapper(4, iparams, 2, fparams, 2, sparams, 2);
 }
 
 void
