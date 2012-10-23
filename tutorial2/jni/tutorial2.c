@@ -36,6 +36,7 @@ typedef enum {
   JNI_WRAPPER_rVOID_pINT = 1,
   JNI_WRAPPER_rVOID_pINT_pINT = 2,
   JNI_WRAPPER_rVOID_pINTA = 3,
+  JNI_WRAPPER_rVOID_pOBJ = 4,
 } jniWrapper_t;
 
 typedef struct {
@@ -69,8 +70,13 @@ callback_t cb[] = {
 	{
 			"callback3", "(II)V", JNI_WRAPPER_rVOID_pINT_pINT,
 	},
+	// callback4 [3]
 	{
 			"callback4", "([I)V", JNI_WRAPPER_rVOID_pINTA,
+	},
+	// callbackObject [4]
+	{
+			"callbackObject", "(Lcom/android/tutorial2/Param;)V", JNI_WRAPPER_rVOID_pOBJ,
 	},
 };
 
@@ -108,7 +114,7 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 	}
 	jclass clazz = (*env)->GetObjectClass(env, thiz);
 	gClass = (jclass)(*env)->NewGlobalRef(env, clazz);
-	if (!clazz) {
+	if (!gClass) {
 		LOGE("callback_handler: failed to get object Class");
 		goto failure;
 	}
@@ -135,6 +141,11 @@ int callStaticMethodWrapper(int id, jint par[], int size) {
 	LOGI("callStaticMethodWrapper called!");
 	JNIEnv *env;
 	int isAttached = 0;
+	jfieldID fid;
+	jclass cls;
+	jintArray iarr;
+	jmethodID constructor;
+	jobject obj;
 	switch ((*gJavaVM)->GetEnv(gJavaVM, (void**)&env, JNI_VERSION_1_4))
 	{
 		case JNI_OK:
@@ -160,6 +171,21 @@ int callStaticMethodWrapper(int id, jint par[], int size) {
 		  (*env)->SetIntArrayRegion(env, cb[id].inta, 0, size, par);
 		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, cb[id].inta);
 	  break;
+	  case JNI_WRAPPER_rVOID_pOBJ:
+		  //Find the "Param" Class
+		  cls = (*env)->FindClass(env, "com/android/tutorial2/Param");
+		  //Create a new Array
+		  iarr = (*env)->NewIntArray(env, size);
+		  //Fill the array with the input parameter
+		  (*env)->SetIntArrayRegion(env, iarr, 0, size, par);
+		  //Find the constructor of the Param object, which takes the int array as parameter
+		  constructor = (*env)->GetMethodID(env, cls, "<init>", "([I)V");
+		  //Create the Object
+		  obj = (*env)->NewObject(env, cls, constructor, iarr);
+		  //Call the callback method passing the object as input parameter
+		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, obj);
+	  	  LOGI("OK");
+	  break;
 	}
 	if (isAttached == 1)
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
@@ -171,7 +197,7 @@ void daemonStart() {
 	flag = 1;
 	jintArray iarr;
 	jint params[2] = {0, 1};
-	callStaticMethodWrapper(3, params, 2);
+	callStaticMethodWrapper(4, params, 2);
 }
 
 void

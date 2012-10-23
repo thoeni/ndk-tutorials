@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
+import com.android.tutorial2.Param;
 
 public class Tutorial2Activity extends Activity implements Runnable {
 
@@ -69,12 +70,19 @@ public class Tutorial2Activity extends Activity implements Runnable {
   
   public static void callback3(int p0, int p1) {
 	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("callback2 called, integer param: "+p0+", "+p1);
+	  output.setText("callback3 called, integer param: "+p0+", "+p1);
   }
   
   public static void callback4(int[] inta) {
 	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("callback2 called, integer param: "+inta[0]+", "+inta[1]);
+	  output.setText("callback4 called, integer param: "+inta[0]+", "+inta[1]);
+  }
+  
+  public static void callbackObject(Param parameters) {
+	  TextView output = (TextView)act.findViewById(R.id.output);
+	  output.setText("callbackObj called, integer param: "+parameters.getiParams()[0]+", "+parameters.getiParams()[1]);
+//	  float[] fParams = (float[])parameters[1];
+//	  String[] sParams = (String[])parameters[2];
   }
   
   public void run() {
