@@ -62,9 +62,9 @@ public class Tutorial2Activity extends Activity implements Runnable {
 	  output.setText("callback1 called");
   }
   
-  public static int callback2(int param0) {
+  public static int callback2(int param0, float param1, String param2) {
 	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("Number is: "+param0);
+	  output.setText("Number is: "+param0+" "+param1+" "+param2);
 	  return 0;
   }
    

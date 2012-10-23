@@ -52,7 +52,7 @@ typedef struct {
     const char* cbSignature;
     jniWrapper_t jniWrapper;
     jmethodID cbMethod;
-    jvalue cbParams[];
+    jvalue cbParams[3];
 } callback_t;
 
 /*
@@ -65,7 +65,7 @@ callback_t cb[] = {
   },
   // cb[1]
   {
-    "callback2", "(I)I", JNI_WRAPPER_rINT_p,
+    "callback2", "(IFLjava/lang/String;)I", JNI_WRAPPER_rINT_p,
   },
 };
 
@@ -152,6 +152,9 @@ int callStaticMethodWrapper(callback_t cb) {
 		  (*env)->CallStaticIntMethod(env, gClass, cb.cbMethod);
 	  break;
 	  case JNI_WRAPPER_rINT_p:
+//		  cb.cbParams[0].i = 34;
+//		  cb.cbParams[1].f = 4.5;
+		  cb.cbParams[2].l = (*env)->NewStringUTF(env, "test");
 		  (*env)->CallStaticIntMethodA(env, gClass, cb.cbMethod, cb.cbParams);
 	  break;
 	  case JNI_WRAPPER_rFLOAT:
@@ -169,7 +172,8 @@ int callStaticMethodWrapper(callback_t cb) {
 void daemonStart() {
 	LOGI("daemonStart called!");
 	flag = 1;
-	cb[1].cbParams[0].i = 75;
+    cb[1].cbParams[0].i = 34;
+	cb[1].cbParams[1].f = 4.5;
 	callStaticMethodWrapper(cb[1]);
 }
 
