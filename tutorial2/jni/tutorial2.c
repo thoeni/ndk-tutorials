@@ -35,6 +35,7 @@ typedef enum {
   JNI_WRAPPER_rVOID_pVOID = 0,
   JNI_WRAPPER_rVOID_pINT = 1,
   JNI_WRAPPER_rVOID_pINT_pINT = 2,
+  JNI_WRAPPER_rVOID_pINTA = 3,
 } jniWrapper_t;
 
 typedef struct {
@@ -49,6 +50,7 @@ typedef struct {
     jniWrapper_t jniWrapper;
     jmethodID cbMethod;
 //  params_t cbParams[];
+    jintArray inta;
 } callback_t;
 
 /*
@@ -66,6 +68,9 @@ callback_t cb[] = {
 	// callback3 [2]
 	{
 			"callback3", "(II)V", JNI_WRAPPER_rVOID_pINT_pINT,
+	},
+	{
+			"callback4", "([I)V", JNI_WRAPPER_rVOID_pINTA,
 	},
 };
 
@@ -126,7 +131,7 @@ failure:
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 }
 
-int callStaticMethodWrapper(int id, params_t *par) {
+int callStaticMethodWrapper(int id, jint par[], int size) {
 	LOGI("callStaticMethodWrapper called!");
 	JNIEnv *env;
 	int isAttached = 0;
@@ -145,17 +150,15 @@ int callStaticMethodWrapper(int id, params_t *par) {
 			LOGE("Invalid java version");
 		break;
 	}
-	LOGI("Calling: %s with signature %s and params %d and %d.", cb[id].cbName, cb[id].cbSignature);
 	switch (cb[id].jniWrapper) {
 	  //
 	  case JNI_WRAPPER_rVOID_pVOID:
 		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod);
 	  break;
-	  case JNI_WRAPPER_rVOID_pINT:
-	      (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, par[0].p_int);
-	  break;
-	  case JNI_WRAPPER_rVOID_pINT_pINT:
-		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, par[0].p_int, par[1].p_int);
+	  case JNI_WRAPPER_rVOID_pINTA:
+		  cb[id].inta = (*env)->NewIntArray(env, size);
+		  (*env)->SetIntArrayRegion(env, cb[id].inta, 0, size, par);
+		  (*env)->CallStaticVoidMethod(env, gClass, cb[id].cbMethod, cb[id].inta);
 	  break;
 	}
 	if (isAttached == 1)
@@ -166,13 +169,9 @@ int callStaticMethodWrapper(int id, params_t *par) {
 void daemonStart() {
 	LOGI("daemonStart called!");
 	flag = 1;
-	params_t params[1];
-	params[0].p_int = 56;
-//	params[1].p_int = 21;
-	/*
-	 * The callStaticMethodWrapper takes (methodID, params)
-	 */
-	callStaticMethodWrapper(1, params);
+	jintArray iarr;
+	jint params[2] = {0, 1};
+	callStaticMethodWrapper(3, params, 2);
 }
 
 void
@@ -188,7 +187,7 @@ void daemonStop() {
 }
 
 void
-Java_com_android_tutorial2_Tutorial2Activity_foo2( JNIEnv* env, jclass thiz )
+Java_com_android_tutorial2_Tutorial2Activity_foo2( JNIEnv* env, jobject thiz )
 {
 	daemonStop();
 }
