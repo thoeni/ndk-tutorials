@@ -47,12 +47,24 @@ typedef enum {
   JNI_WRAPPER_rFLOAT_p = 5
 } jniWrapper_t;
 
+typedef enum {
+	INT = 0,
+	FLOAT = 1,
+	STRING = 2,
+} nType;
+
+typedef struct {
+	int i;
+	float f;
+	char* s;
+	nType type;
+} nvalue;
+
 typedef struct {
     const char* cbName;
     const char* cbSignature;
     jniWrapper_t jniWrapper;
     jmethodID cbMethod;
-    jvalue cbParams[3];
 } callback_t;
 
 /*
@@ -125,7 +137,7 @@ failure:
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 }
 
-int callStaticMethodWrapper(callback_t cb) {
+int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 	LOGI("callStaticMethodWrapper called!");
 	JNIEnv *env;
 	int isAttached = 0;
@@ -139,29 +151,45 @@ int callStaticMethodWrapper(callback_t cb) {
 		}
 		isAttached = 1;
 	}
-	//LOGI("Entering the switch for cb method %s with signature %s, case %d", cb.cbName, cb.cbSignature, cb.jniWrapper);
-	switch (cb.jniWrapper) {
-	  //
+	//Case with parameters:
+	//Create a jvalue array with the same size of the nvalue array:
+	jvalue jpar[parSize];
+	if (parSize > 0) {
+		//Handle mapping nvalue -> jvalue
+		int i;
+		for (i=0; i<parSize; i++) {
+			switch (npar[i].type) {
+			case INT:
+				jpar[i].i = npar[i].i;
+			break;
+			case FLOAT:
+				jpar[i].f = npar[i].f;
+			break;
+			case STRING:
+				jpar[i].l = (*env)->NewStringUTF(env, npar[i].s);
+			break;
+			}
+		}
+	}
+	//LOGI("Entering the switch for cb[mid] method %s with signature %s, case %d", cb[mid].cbName, cb[mid].cbSignature, cb.jniWrapper);
+	switch (cb[mid].jniWrapper) {
 	  case JNI_WRAPPER_rVOID:
-		  (*env)->CallStaticVoidMethod(env, gClass, cb.cbMethod);
-	  break;
-	  case JNI_WRAPPER_rVOID_p:
-		  (*env)->CallStaticVoidMethodA(env, gClass, cb.cbMethod, cb.cbParams);
+		  (*env)->CallStaticVoidMethod(env, gClass, cb[mid].cbMethod);
 	  break;
 	  case JNI_WRAPPER_rINT:
-		  (*env)->CallStaticIntMethod(env, gClass, cb.cbMethod);
-	  break;
-	  case JNI_WRAPPER_rINT_p:
-//		  cb.cbParams[0].i = 34;
-//		  cb.cbParams[1].f = 4.5;
-		  cb.cbParams[2].l = (*env)->NewStringUTF(env, "test");
-		  (*env)->CallStaticIntMethodA(env, gClass, cb.cbMethod, cb.cbParams);
+		  (*env)->CallStaticIntMethod(env, gClass, cb[mid].cbMethod);
 	  break;
 	  case JNI_WRAPPER_rFLOAT:
-		  (*env)->CallStaticFloatMethod(env, gClass, cb.cbMethod);
+		  (*env)->CallStaticFloatMethod(env, gClass, cb[mid].cbMethod);
+	  break;
+	  case JNI_WRAPPER_rVOID_p:
+		  (*env)->CallStaticVoidMethodA(env, gClass, cb[mid].cbMethod, jpar);
+	  break;
+	  case JNI_WRAPPER_rINT_p:
+		  (*env)->CallStaticIntMethodA(env, gClass, cb[mid].cbMethod, jpar);
 	  break;
 	  case JNI_WRAPPER_rFLOAT_p:
-		  (*env)->CallStaticFloatMethodA(env, gClass, cb.cbMethod, cb.cbParams);
+		  (*env)->CallStaticFloatMethodA(env, gClass, cb[mid].cbMethod, jpar);
 	  break;
 	}
 	if(isAttached)
@@ -172,9 +200,20 @@ int callStaticMethodWrapper(callback_t cb) {
 void daemonStart() {
 	LOGI("daemonStart called!");
 	flag = 1;
-    cb[1].cbParams[0].i = 34;
-	cb[1].cbParams[1].f = 4.5;
-	callStaticMethodWrapper(cb[1]);
+	nvalue v1;
+	v1.type = INT;
+	v1.i = 12;
+	nvalue v2;
+	v2.type = FLOAT;
+	v2.f = 2.3;
+	nvalue v3;
+	v3.type = STRING;
+	v3.s = "string";
+	nvalue npar[3];
+	npar[0] = v1;
+	npar[1] = v2;
+	npar[2] = v3;
+	callStaticMethodWrapper(1, npar, 3);
 }
 
 void
