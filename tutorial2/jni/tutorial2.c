@@ -146,8 +146,14 @@ failure:
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 }
 
+/*
+ * The callStaticMethodWrapper takes as input the int mid number which identifies the callback method
+ * to be called, the nvalue npar[] array, which contains the input parameters, if any, and the parSize
+ * which indicates the number of parameters
+ */
+
 int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
-	LOGI("callStaticMethodWrapper called!");
+	LOGI("callStaticMethodWrapper called for cb[%d] method %s,signature %s, switch case %d", mid, cb[mid].cbName, cb[mid].cbSignature, cb[mid].jniWrapper);
 	JNIEnv *env;
 	int isAttached = 0;
 	int status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
@@ -160,7 +166,6 @@ int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 		}
 		isAttached = 1;
 	}
-	LOGI("isAttached value: %d", isAttached);
 	//Case with parameters:
 	//Create a jvalue array with the same size of the nvalue array:
 	jvalue jpar[parSize];
@@ -181,7 +186,6 @@ int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 			}
 		}
 	}
-	LOGI("Entering the switch for cb[%d] method %s with signature %s, case %d", mid, cb[mid].cbName, cb[mid].cbSignature, cb[mid].jniWrapper);
 	switch (cb[mid].jniWrapper) {
 	  case JNI_WRAPPER_rVOID:
 		  (*env)->CallStaticVoidMethod(env, gClass, cb[mid].cbMethod);
@@ -203,17 +207,20 @@ int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 	  break;
 	}
 	if(isAttached)
-		LOGI("Thread detaching...");
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 	return 0;
 }
+
+/*
+ * The *randomCaller switches between four callbacks declared above, preparing the input
+ * parameters needed by each call.
+ */
 
 void *randomCaller() {
 	flag = 1;
 	int i=0;
 	nvalue v1, v2, v3, npar[3];
 	while (flag == 1) {
-		sleep(2);
 		switch(i){
 			case 0:
 				i=1;
@@ -247,6 +254,7 @@ void *randomCaller() {
 				callStaticMethodWrapper(3, npar, 1);
 			break;
 		}
+		sleep(2);
 	}
 }
 
@@ -258,10 +266,15 @@ void daemonStart() {
 	iret = pthread_create( &thread, NULL, randomCaller, NULL);
 }
 
+/*
+ * We could have used the jobject below, to access to the view and to public non-static methods,
+ * but the aim of this tutorial is to sumulate a native thread which can asynchronously interact
+ * with the Java View, without necessarily being linked to the calling object.
+ */
+
 void
 Java_com_android_tutorial2_Tutorial2Activity_foo1( JNIEnv* env, jobject thiz)
 {
-    LOGI("foo1 called!");
 	daemonStart();
 }
 
