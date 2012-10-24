@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #define  LOG_TAG    "tutorial2"
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
@@ -78,6 +79,14 @@ callback_t cb[] = {
   // cb[1]
   {
     "callback2", "(IFLjava/lang/String;)I", JNI_WRAPPER_rINT_p,
+  },
+  // cb[2]
+  {
+	"callback3", "(Ljava/lang/String;)V", JNI_WRAPPER_rVOID_p,
+  },
+  // cb[2]
+  {
+  	"callback4", "(F)F", JNI_WRAPPER_rFLOAT_p,
   },
 };
 
@@ -151,6 +160,7 @@ int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 		}
 		isAttached = 1;
 	}
+	LOGI("isAttached value: %d", isAttached);
 	//Case with parameters:
 	//Create a jvalue array with the same size of the nvalue array:
 	jvalue jpar[parSize];
@@ -171,7 +181,7 @@ int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 			}
 		}
 	}
-	//LOGI("Entering the switch for cb[mid] method %s with signature %s, case %d", cb[mid].cbName, cb[mid].cbSignature, cb.jniWrapper);
+	LOGI("Entering the switch for cb[%d] method %s with signature %s, case %d", mid, cb[mid].cbName, cb[mid].cbSignature, cb[mid].jniWrapper);
 	switch (cb[mid].jniWrapper) {
 	  case JNI_WRAPPER_rVOID:
 		  (*env)->CallStaticVoidMethod(env, gClass, cb[mid].cbMethod);
@@ -193,27 +203,59 @@ int callStaticMethodWrapper(int mid, nvalue npar[], int parSize) {
 	  break;
 	}
 	if(isAttached)
+		LOGI("Thread detaching...");
 		(*gJavaVM)->DetachCurrentThread(gJavaVM);
 	return 0;
 }
 
+void *randomCaller() {
+	flag = 1;
+	int i=0;
+	nvalue v1, v2, v3, npar[3];
+	while (flag == 1) {
+		sleep(2);
+		switch(i){
+			case 0:
+				i=1;
+				callStaticMethodWrapper(0, NULL, 0);
+			break;
+			case 1:
+				i=2;
+				v1.type = INT;
+				v1.i = 12;
+				v2.type = FLOAT;
+				v2.f = 2.3;
+				v3.type = STRING;
+				v3.s = "string";
+				npar[0] = v1;
+				npar[1] = v2;
+				npar[2] = v3;
+				callStaticMethodWrapper(1, npar, 3);
+			break;
+			case 2:
+				i=3;
+				v1.type = STRING;
+				v1.s = "string";
+				npar[0] = v1;
+				callStaticMethodWrapper(2, npar, 1);
+			break;
+			case 3:
+				i=0;
+				v1.type = FLOAT;
+				v1.f = 2.3;
+				npar[0] = v1;
+				callStaticMethodWrapper(3, npar, 1);
+			break;
+		}
+	}
+}
+
 void daemonStart() {
 	LOGI("daemonStart called!");
-	flag = 1;
-	nvalue v1;
-	v1.type = INT;
-	v1.i = 12;
-	nvalue v2;
-	v2.type = FLOAT;
-	v2.f = 2.3;
-	nvalue v3;
-	v3.type = STRING;
-	v3.s = "string";
-	nvalue npar[3];
-	npar[0] = v1;
-	npar[1] = v2;
-	npar[2] = v3;
-	callStaticMethodWrapper(1, npar, 3);
+	pthread_t thread;
+	char *message = "Thread 1 started!";
+	int iret;
+	iret = pthread_create( &thread, NULL, randomCaller, NULL);
 }
 
 void

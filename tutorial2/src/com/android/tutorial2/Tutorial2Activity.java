@@ -58,16 +58,31 @@ public class Tutorial2Activity extends Activity implements Runnable {
   }
   
   public static void callback1() {
-	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("callback1 called");
+	  System.out.println("callback1 called");
+//	  TextView output = (TextView)act.findViewById(R.id.output);
+//	  output.setText("callback1 called");
   }
   
   public static int callback2(int param0, float param1, String param2) {
-	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("Number is: "+param0+" "+param1+" "+param2);
+	  System.out.println("callback2 called, params are: "+param0+" "+param1+" "+param2);
+//	  TextView output = (TextView)act.findViewById(R.id.output);
+//	  output.setText("callback 2, params are: "+param0+" "+param1+" "+param2);
 	  return 0;
   }
-   
+  
+  public static void callback3(String param0) {
+	  System.out.println("callback 3, param is: "+param0);
+//	  TextView output = (TextView)act.findViewById(R.id.output);
+//	  output.setText("callback 3, param is: "+param0);
+  }
+  
+  public static float callback4(float param0) {
+	  System.out.println("callback 4, param is: "+param0);
+//	  TextView output = (TextView)act.findViewById(R.id.output);
+//	  output.setText("callback 4, param is: "+param0);
+	  return param0;
+  }
+  
   public void run() {
   //  this.handler.postDelayed(this, 2000);
   }
