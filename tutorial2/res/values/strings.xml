@@ -3,4 +3,7 @@
   <string name="app_name">Tutorial2Activity</string>
   <string name="button0">Start the random routine</string>
   <string name="button1">Stop the random routine</string>
+  <string name="start_service">Start Service</string>
+  <string name="stop_service">Stop Service</string>
+  <string name="button2">Force init() from Activity</string>
 </resources>

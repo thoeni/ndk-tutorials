@@ -104,8 +104,58 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
     return JNI_VERSION_1_4;
 }
 
+/*********************************
+ * ACTIVITY VERSION JNI FUNCTION *
+ *********************************/
+
 void
 Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
+{
+	LOGI("init called!");
+	int status;
+	int isAttached = 0;
+	status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
+	if(status < 0) {
+		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
+		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
+		if(status < 0) {
+			LOGE("callback_handler: failed to attach current thread");
+			return;
+		}
+		isAttached = 1;
+	}
+	jclass clazz = (*env)->GetObjectClass(env, thiz);
+	gClass = (jclass)(*env)->NewGlobalRef(env, clazz);
+	if (!clazz) {
+		LOGE("callback_handler: failed to get object Class");
+		goto failure;
+	}
+
+	//The following cycle will resolve all the methodIDs declared in the cb[] array
+	if(!cb)
+		goto failure;
+
+	int i = sizeof cb / sizeof cb[0];
+	while(i--) {
+		LOGI("Method %d is %s with signature %s", i, cb[i].cbName, cb[i].cbSignature);
+		cb[i].cbMethod = (*env)->GetStaticMethodID(env, clazz, cb[i].cbName, cb[i].cbSignature);
+		if(!cb[i].cbMethod) {
+			LOGE("callback_handler: failed to get method ID");
+			goto failure;
+		}
+	}
+
+failure:
+	if(isAttached)
+		(*gJavaVM)->DetachCurrentThread(gJavaVM);
+}
+
+/********************************
+ * SERVICE VERSION JNI FUNCTION *
+ ********************************/
+
+void
+Java_com_android_tutorial2_MyService_init( JNIEnv* env, jobject thiz )
 {
 	LOGI("init called!");
 	int status;

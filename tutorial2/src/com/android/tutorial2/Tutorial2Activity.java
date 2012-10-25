@@ -17,8 +17,11 @@
 package com.android.tutorial2;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -63,6 +66,10 @@ public class Tutorial2Activity extends Activity implements Runnable {
   
   public void button1(View v){
 	  foo2();
+  }
+  
+  public void button2(View v){
+	  init();
   }
   
   /*
@@ -119,13 +126,13 @@ public class Tutorial2Activity extends Activity implements Runnable {
 			output.setText("callback 3, param is: "+string0);
 		}
   };
-  
-  public static float callback4(float param0) {
-	  System.out.println("callback 4, param is: "+param0);
-	  float0 = param0;
-	  myHandler.post(callback4Thread);
-	  return param0;
-  }
+
+	public static float callback4(final float param0) {
+		System.out.println("callback 4, param is: " + param0);
+		float0 = param0;
+		myHandler.post(callback4Thread);
+		return param0;
+	}
   
   static Runnable callback4Thread = new Runnable() {
 		@Override
@@ -139,7 +146,30 @@ public class Tutorial2Activity extends Activity implements Runnable {
   //  this.handler.postDelayed(this, 2000);
   }
   
-  public native void init();
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu, menu);
+//		return super.onCreateOptionsMenu(menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		Intent intent = new Intent(this,MyService.class);
+		
+		switch(item.getItemId()) {
+			case R.id.item_start_service:
+				startService(intent);
+				return true;
+			case R.id.item_stop_service:
+				stopService(intent);
+				return true;
+			default:
+				return false;
+		}
+	}
+
+public native void init();
   public native void foo1();
   public native void foo2();
   

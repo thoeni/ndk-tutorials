@@ -10,9 +10,36 @@
       android:layout_height="wrap_content"
       android:gravity="center" />
 
-  <Button android:layout_width="fill_parent" android:layout_height="wrap_content"
-    android:id="@+id/button0" android:text="@string/button0" android:onClick="button0"/>
+  <Button
+      android:id="@+id/button2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:ellipsize="middle"
+      android:fadingEdge="horizontal"
+      android:gravity="center_vertical|center_horizontal"
+      android:minWidth="44dip"
+      android:onClick="button2"
+      android:text="@string/button2" />
   
-  <Button android:layout_width="fill_parent" android:layout_height="wrap_content"
-    android:id="@+id/button1" android:text="@string/button1" android:onClick="button1"/>
+  <Button
+      android:id="@+id/button0"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:ellipsize="middle"
+      android:fadingEdge="horizontal"
+      android:gravity="center_vertical|center_horizontal"
+      android:minWidth="44dip"
+      android:onClick="button0"
+      android:text="@string/button0" />
+  
+  <Button
+      android:id="@+id/button1"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center_horizontal"
+      android:onClick="button1"
+      android:text="@string/button1" />
+
 </LinearLayout>
