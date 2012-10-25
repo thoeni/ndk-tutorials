@@ -1,5 +1,28 @@
 Tutorials to explore JNI calls into Android environment, through the ndk development kit.
 
+###################################################################
+                  NOTES ON THE "SERVICE" BRANCH
+###################################################################
+
+The "service" branch comes out from the intent to explore the
+possibility to have a running service which communicates with the
+native library (asynchronously), and on the other hand talks to a
+potential "Activity" through some messaging Android's mechanisms.
+This first release just branches the "experimental" branch, and
+introduces the MyService class, which basically just runs the init
+task, and the "daemonStart()" function can be triggered by any
+class, since it doesn't take as input any reference to the caller.
+
+TODO: The next steps may focus on the messaging mechanisms to let
+an Activity and its Service communicate each other. The service as
+is, so far, is unbounded. To be decided whether it should be linked
+to the Binder as well (introducing some new elements as the .aidl
+interface definition).
+
+So far, so good.
+
+###################################################################
+
 How to make it work:
 
 0- Clone the tutorials into your <ndk-root> folder
