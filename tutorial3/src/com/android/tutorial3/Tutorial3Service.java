@@ -5,15 +5,20 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
-public class Tutorial3Service extends Service {
+public abstract class Tutorial3Service extends Service {
 	static final String TAG = "Tutorial3Service";
 	 //Testare questo:
-	public int recipe;
+	
+	static int recipe = 0;
+	
+	static void setRecipe(int recipes){
+		recipe = recipes;
+	}
 	
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		init();
+		init(recipe);
 		Log.d(TAG, "onCreated");
 	}
 
@@ -34,25 +39,19 @@ public class Tutorial3Service extends Service {
 		return null;
 	}
 
-	public native void init();
+	public native void init(int recipe);
 
 	public native void foo1();
 
 	public native void foo2();
 	
-	public void callback1() {
-	}
+	abstract void callback1();
 	
-	public int callback2(int param0, float param1, String param2) {
-		return 0;
-	}
+	abstract int callback2(int param0, float param1, String param2);
 	
-	public void callback3(String param0) {
-	}
+	abstract void callback3(String param0);
 	
-	public float callback4(final float param0) {
-		return param0;
-	}
+	abstract float callback4(final float param0);
 
 	//Provare a inizializzare variabili qui sotto..
 	static {
