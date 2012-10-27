@@ -25,9 +25,8 @@ import android.widget.TextView;
 public class Tutorial2Activity extends Activity implements Runnable {
 
   private TextView output;
-  private Handler handler;
+  private static Handler handler;
   public static Activity act;
-  public static Handler myHandler;
   
   //The three following variables have been declared static to be accessed
   //from within the static runnable callback methods run() below.
@@ -40,21 +39,20 @@ public class Tutorial2Activity extends Activity implements Runnable {
     super.setContentView(R.layout.main);
     act = this;
     init();
-    this.handler = new Handler();
-    myHandler = this.handler;
+    handler = new Handler();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    this.handler.post(this);
+    handler.post(this);
   }
 
   @Override
   public void onPause() {
     super.onPause();
     //TODO: Check this
-    this.handler.removeCallbacks(this);
+    handler.removeCallbacks(this);
   }
 
   public void button0(View v){
@@ -78,7 +76,7 @@ public class Tutorial2Activity extends Activity implements Runnable {
   
   public static void callback1() {
 	  System.out.println("callback1 called");
-	  myHandler.post(callback1Thread);
+	  handler.post(callback1Thread);
   }
   
   static Runnable callback1Thread = new Runnable() {
@@ -94,7 +92,7 @@ public class Tutorial2Activity extends Activity implements Runnable {
 	  int0 = param0;
 	  float0 = param1;
 	  string0 = param2;
-	  myHandler.post(callback2Thread);
+	  handler.post(callback2Thread);
 	  return 0;
   }
   
@@ -109,7 +107,7 @@ public class Tutorial2Activity extends Activity implements Runnable {
   public static void callback3(String param0) {
 	  System.out.println("callback 3, param is: "+param0);
 	  string0 = param0;
-	  myHandler.post(callback3Thread);
+	  handler.post(callback3Thread);
   }
 
   static Runnable callback3Thread = new Runnable() {
@@ -123,7 +121,7 @@ public class Tutorial2Activity extends Activity implements Runnable {
   public static float callback4(float param0) {
 	  System.out.println("callback 4, param is: "+param0);
 	  float0 = param0;
-	  myHandler.post(callback4Thread);
+	  handler.post(callback4Thread);
 	  return param0;
   }
   
