@@ -1,4 +1,18 @@
-Tutorials to explore JNI calls into Android environment, through the ndk development kit.
+############################## EXPERIMENTAL BRANCH ############################
+Tutorial1: Contains a very basic example of how a JNI callback to a Java Static
+	   method works
+Tutorial2: Contains an example to explore some possibilities of JNI callbacks
+	   ran within a native thread, properly attached to the current JVM.
+	   The callbacks go from native code to Android Activity, and interact
+	   with the UI
+Tutorial3: Contains an example where the native code calls back to an Android
+	   Service. In this example the Service called "Tutorial3Service" just
+	   loads the native shared library and permits a custom service which
+	   extends it to override callback methods.
+###############################################################################
+
+The full package consists of 3 tutorials to explore JNI calls into Android
+environment, through the ndk development kit.
 
 How to make it work:
 
