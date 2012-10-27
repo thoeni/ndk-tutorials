@@ -75,9 +75,9 @@ typedef struct {
 } callback_t;
 
 /*
- * Declaration of callbacks methods, with regard to the callback_t structure:
+ * Declaration of callback methods, with regard to the callback_t structure:
  * here we declare the method name, the method signature, and the type of method
- * to be called, tipically it will depend on the return type, and the presence
+ * to be called, typically it will depend on the return type, and the presence
  * or absence of input parameters.
  */
 callback_t cb[] = {
@@ -194,7 +194,7 @@ int callMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
 }
 
 /*
- * The *randomCaller switches between four callbacks declared above, preparing the input
+ * The *randomCaller switches between four callback declared above, preparing the input
  * parameters needed by each call.
  */
 
