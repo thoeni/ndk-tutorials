@@ -1,4 +1,4 @@
-############################## EXPERIMENTAL BRANCH ############################
+################################# MASTER BRANCH ###############################
 Tutorial1: Contains a very basic example of how a JNI callback to a Java Static
 	   method works
 Tutorial2: Contains an example to explore some possibilities of JNI callbacks
@@ -22,8 +22,8 @@ How to make it work:
 In Eclipse:
 Click File > New Android Project...
 Select the Create project from existing source radio button.
-Select any API level above Android 1.5.
-In the Location field, click Browse... and select the proper tutorialX directory.
+Select any API level above Android 1.5
+In the Location field, click Browse... and select the proper tutorialX dir.
 Click Finish.
 
 2- On the command line:
@@ -34,4 +34,4 @@ Compile the native code using the ndk-build command.
 cd <ndk-root>/tutorials/tutorialX
 <ndk_root>/ndk-build
 
-4- In Eclipse: after you launched the emulator, run project as Android Application
+4- In Eclipse: after you launched the emulator, run project as Android App
