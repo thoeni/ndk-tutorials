@@ -108,19 +108,8 @@ void
 Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 {
 	LOGI("init called!");
-	int status;
-	int isAttached = 0;
-	status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
-	if(status < 0) {
-		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
-		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
-		if(status < 0) {
-			LOGE("callback_handler: failed to attach current thread");
-			return;
-		}
-		isAttached = 1;
-	}
 	jclass clazz = (*env)->GetObjectClass(env, thiz);
+	//Save the global reference to the class which the jobject belongs to.
 	gClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 	if (!clazz) {
 		LOGE("callback_handler: failed to get object Class");
@@ -142,14 +131,13 @@ Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 	}
 
 failure:
-	if(isAttached)
-		(*gJavaVM)->DetachCurrentThread(gJavaVM);
+	return;
 }
 
 /*
  * The callStaticMethodWrapper takes as input the int mid number which identifies the callback method
  * to be called, the nvalue npar[] array, which contains the input parameters, if any, and the parSize
- * which indicates the number of parameters
+ * which indicates the number of parameters.
  */
 
 int callStaticMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
@@ -267,7 +255,7 @@ void daemonStart() {
 
 /*
  * We could have used the jobject below, to access to the view and to public non-static methods,
- * but the aim of this tutorial is to sumulate a native thread which can asynchronously interact
+ * but the aim of this tutorial is to simulate a native thread which can asynchronously interact
  * with the Java View, without necessarily being linked to the calling object.
  */
 

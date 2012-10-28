@@ -24,9 +24,8 @@ import android.widget.TextView;
 
 public class Tutorial2Activity extends Activity implements Runnable {
 
-  private TextView output;
+  private static TextView output;
   private static Handler handler;
-  public static Activity act;
   
   //The three following variables have been declared static to be accessed
   //from within the static runnable callback methods run() below.
@@ -37,7 +36,7 @@ public class Tutorial2Activity extends Activity implements Runnable {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     super.setContentView(R.layout.main);
-    act = this;
+    output = (TextView)findViewById(R.id.output);
     init();
     handler = new Handler();
   }
@@ -82,7 +81,6 @@ public class Tutorial2Activity extends Activity implements Runnable {
   static Runnable callback1Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
 			output.setText("callback 1, no params");
 		}
   };
@@ -99,7 +97,6 @@ public class Tutorial2Activity extends Activity implements Runnable {
   static Runnable callback2Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
 			output.setText("callback 2, params are: "+int0+", "+float0+", "+string0);
 		}
   };
@@ -113,7 +110,6 @@ public class Tutorial2Activity extends Activity implements Runnable {
   static Runnable callback3Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
 			output.setText("callback 3, param is: "+string0);
 		}
   };
@@ -128,7 +124,6 @@ public class Tutorial2Activity extends Activity implements Runnable {
   static Runnable callback4Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
 			output.setText("callback 4, param is: "+float0);
 		}
   };
