@@ -27,59 +27,36 @@
 #define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
-static JavaVM *gJavaVM;
-static jobject gInterfaceObject, gDataObject;
-
 jstring
 Java_com_android_tutorial1_Tutorial1Activity_foo1( JNIEnv* env, jobject thiz, jstring message )
 {
-    LOGI("foo1 called!");
+	//To print out a char* we have to convert the jstring to char*
+	const char *nativeString = (*env)->GetStringUTFChars(env, message, 0);
+    LOGI("foo1 called! Input parameter: %s", nativeString);
+    //Then we have to release the memory allocated for the string
+    (*env)->ReleaseStringUTFChars(env, message, nativeString);
 	return (*env)->NewStringUTF(env, "JNI call J2C performed!");
 }
 
 void
-Java_com_android_tutorial1_Tutorial1Activity_foo2( JNIEnv* env, jclass thiz )
+Java_com_android_tutorial1_Tutorial1Activity_foo2( JNIEnv* env, jobject thiz )
 {
 	LOGI("foo2 called!");
-	int status;
-	int isAttached = 0;
-	status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
-	if(status < 0) {
-		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
-		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
-		if(status < 0) {
-			LOGE("callback_handler: failed to attach current thread");
-			return;
-		}
-		isAttached = 1;
-	}
+	//Get class from the calling object
 	jclass clazz = (*env)->GetObjectClass(env, thiz);
 	if (!clazz) {
 		LOGE("callback_handler: failed to get object Class");
 		goto failure;
 	}
-
-	jmethodID method = (*env)->GetStaticMethodID(env, clazz, "foo3Callback", "()V");
+	//Get the methodID from the class which the calling object belongs
+	jmethodID method = (*env)->GetMethodID(env, clazz, "foo3Callback", "()V");
 	if(!method) {
 		LOGE("callback_handler: failed to get method ID");
 		goto failure;
 	}
-
-	(*env)->CallStaticVoidMethod(env, clazz, method);
+	//Call the method on the calling object, defined by the methodID
+	(*env)->CallVoidMethod(env, thiz, method);
 
 failure:
-	if(isAttached)
-		(*gJavaVM)->DetachCurrentThread(gJavaVM);
-}
-
-jint JNI_OnLoad(JavaVM* vm, void* reserved)
-{
-    JNIEnv *env;
-    gJavaVM = vm;
-    LOGI("JNI_OnLoad called");
-    if ( (*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        LOGE("Failed to get the environment using GetEnv()");
-        return -1;
-    }
-    return JNI_VERSION_1_4;
+	return;
 }

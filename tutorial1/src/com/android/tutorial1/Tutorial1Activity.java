@@ -20,19 +20,16 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 
 public class Tutorial1Activity extends Activity implements Runnable {
 
   private TextView output;
   private Handler handler;
-  private static Activity act;
   
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     super.setContentView(R.layout.main);
-    act = this;
     output = (TextView)super.findViewById(R.id.output);
     this.handler = new Handler();
   }
@@ -51,16 +48,11 @@ public class Tutorial1Activity extends Activity implements Runnable {
   }
 
   public void button0(View v){
-	  output.setText(foo1("prova"));
+	  output.setText(foo1("testString"));
   }
   
   public void button1(View v){
 	  foo2();
-  }
-  
-  public static void foo3Callback() {
-	  TextView output = (TextView)act.findViewById(R.id.output);
-	  output.setText("foo3Callback called back by foo2");
   }
    
   public void run() {
@@ -69,6 +61,11 @@ public class Tutorial1Activity extends Activity implements Runnable {
   
   public native String foo1(String message);
   public native void foo2();
+  
+  public void foo3Callback() {
+	  String message = "foo3Callback called back by foo2";
+	  output.setText(message);
+  }
   
   static {
       System.loadLibrary("tutorial1");
