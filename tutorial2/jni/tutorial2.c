@@ -29,7 +29,7 @@
 #define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,LOG_TAG,__VA_ARGS__)
 
 static JavaVM *gJavaVM;
-static jobject gInterfaceObject, gDataObject;
+static jobject gObject;
 static jclass gClass;
 
 
@@ -107,43 +107,28 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 void
 Java_com_android_tutorial2_Tutorial2Activity_init( JNIEnv* env, jobject thiz )
 {
-	LOGI("init called!");
+	LOGI("init native function called");
 	int status;
 	int isAttached = 0;
-	status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
-	if(status < 0) {
-		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
-		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
-		if(status < 0) {
-			LOGE("callback_handler: failed to attach current thread");
-			return;
-		}
-		isAttached = 1;
-	}
+	gObject = (jobject)(*env)->NewGlobalRef(env, thiz);
 	jclass clazz = (*env)->GetObjectClass(env, thiz);
 	gClass = (jclass)(*env)->NewGlobalRef(env, clazz);
 	if (!clazz) {
 		LOGE("callback_handler: failed to get object Class");
 		goto failure;
 	}
-
-	//The following cycle will resolve all the methodIDs declared in the cb[] array
-	if(!cb)
-		goto failure;
-
 	int i = sizeof cb / sizeof cb[0];
+	LOGI("getting methodIDs of %d configured callback methods", i);
 	while(i--) {
 		LOGI("Method %d is %s with signature %s", i, cb[i].cbName, cb[i].cbSignature);
-		cb[i].cbMethod = (*env)->GetStaticMethodID(env, clazz, cb[i].cbName, cb[i].cbSignature);
+		cb[i].cbMethod = (*env)->GetMethodID(env, clazz, cb[i].cbName, cb[i].cbSignature);
 		if(!cb[i].cbMethod) {
 			LOGE("callback_handler: failed to get method ID");
 			goto failure;
 		}
 	}
-
 failure:
-	if(isAttached)
-		(*gJavaVM)->DetachCurrentThread(gJavaVM);
+	return;
 }
 
 /*
@@ -152,8 +137,10 @@ failure:
  * which indicates the number of parameters
  */
 
-int callStaticMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
-	LOGI("callStaticMethodWrapper called for cb[%d] method %s,signature %s, switch case %d", mid, cb[mid].cbName, cb[mid].cbSignature, cb[mid].jniWrapper);
+int callMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
+	LOGI("callStaticMethodWrapper called for cb[%d] method %s,signature %s,"
+			"switch case %d", mid, cb[mid].cbName, cb[mid].cbSignature,
+			cb[mid].jniWrapper);
 	//Case with parameters:
 	//Create a jvalue array with the same size of the nvalue array:
 	jvalue jpar[parSize];
@@ -176,22 +163,22 @@ int callStaticMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
 	}
 	switch (cb[mid].jniWrapper) {
 	  case JNI_WRAPPER_rVOID:
-		  (*env)->CallStaticVoidMethod(env, gClass, cb[mid].cbMethod);
+		  (*env)->CallVoidMethod(env, gObject, cb[mid].cbMethod);
 	  break;
 	  case JNI_WRAPPER_rINT:
-		  (*env)->CallStaticIntMethod(env, gClass, cb[mid].cbMethod);
+		  (*env)->CallIntMethod(env, gObject, cb[mid].cbMethod);
 	  break;
 	  case JNI_WRAPPER_rFLOAT:
-		  (*env)->CallStaticFloatMethod(env, gClass, cb[mid].cbMethod);
+		  (*env)->CallFloatMethod(env, gObject, cb[mid].cbMethod);
 	  break;
 	  case JNI_WRAPPER_rVOID_p:
-		  (*env)->CallStaticVoidMethodA(env, gClass, cb[mid].cbMethod, jpar);
+		  (*env)->CallVoidMethodA(env, gObject, cb[mid].cbMethod, jpar);
 	  break;
 	  case JNI_WRAPPER_rINT_p:
-		  (*env)->CallStaticIntMethodA(env, gClass, cb[mid].cbMethod, jpar);
+		  (*env)->CallIntMethodA(env, gObject, cb[mid].cbMethod, jpar);
 	  break;
 	  case JNI_WRAPPER_rFLOAT_p:
-		  (*env)->CallStaticFloatMethodA(env, gClass, cb[mid].cbMethod, jpar);
+		  (*env)->CallFloatMethodA(env, gObject, cb[mid].cbMethod, jpar);
 	  break;
 	}
 	return 0;
@@ -221,7 +208,7 @@ void *randomCaller() {
 		switch(i){
 			case 0:
 				i=1;
-				callStaticMethodWrapper(env, 0, NULL, 0);
+				callMethodWrapper(env, 0, NULL, 0);
 			break;
 			case 1:
 				i=2;
@@ -234,21 +221,21 @@ void *randomCaller() {
 				npar[0] = v1;
 				npar[1] = v2;
 				npar[2] = v3;
-				callStaticMethodWrapper(env, 1, npar, 3);
+				callMethodWrapper(env, 1, npar, 3);
 			break;
 			case 2:
 				i=3;
 				v1.type = STRING;
 				v1.s = "test string :)";
 				npar[0] = v1;
-				callStaticMethodWrapper(env, 2, npar, 1);
+				callMethodWrapper(env, 2, npar, 1);
 			break;
 			case 3:
 				i=0;
 				v1.type = FLOAT;
 				v1.f = 2.3;
 				npar[0] = v1;
-				callStaticMethodWrapper(env, 3, npar, 1);
+				callMethodWrapper(env, 3, npar, 1);
 			break;
 		}
 		sleep(2);

@@ -24,124 +24,126 @@ import android.widget.TextView;
 
 public class Tutorial2Activity extends Activity implements Runnable {
 
-  private TextView output;
-  private static Handler handler;
-  public static Activity act;
-  
-  //The three following variables have been declared static to be accessed
-  //from within the static runnable callback methods run() below.
-  static int int0;
-  static float float0;
-  static String string0;
-  
-  public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    super.setContentView(R.layout.main);
-    act = this;
-    init();
-    handler = new Handler();
-  }
+	private TextView output;
+	private Handler handler;
 
-  @Override
-  public void onResume() {
-    super.onResume();
-    handler.post(this);
-  }
+	// The three following variables have been declared static to be accessed
+	// from within the static runnable callback methods run() below.
+	static int int0;
+	static float float0;
+	static String string0;
 
-  @Override
-  public void onPause() {
-    super.onPause();
-    //TODO: Check this
-    handler.removeCallbacks(this);
-  }
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		super.setContentView(R.layout.main);
+		output = (TextView) findViewById(R.id.output);
+		init();
+		handler = new Handler();
+	}
 
-  public void button0(View v){
-	  foo1();
-  }
-  
-  public void button1(View v){
-	  foo2();
-  }
-  
-  /*
-   * Callback methods are declared as static, because we want a native function to call them asynchronously,
-   * with no reference to the current object.
-   * Therefore our native functions will rely only on the Activity class, and on its static methods.
-   * 
-   * For each callback method, we declare a (static, for the same reason as before) Runnable object, that
-   * will be able to interact with the User Interface from within the thread call. If we don't pass through
-   * this mechanism, an exception will be thrown, because by default only the generating thread can
-   * access to the View object, and not other threads (as the *randomCaller wants to do, from native code.
-   */
-  
-  public static void callback1() {
-	  System.out.println("callback1 called");
-	  handler.post(callback1Thread);
-  }
-  
-  static Runnable callback1Thread = new Runnable() {
+	@Override
+	public void onResume() {
+		super.onResume();
+		handler.post(this);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		// TODO: Check this
+		handler.removeCallbacks(this);
+	}
+
+	public void button0(View v) {
+		foo1();
+	}
+
+	public void button1(View v) {
+		foo2();
+	}
+
+	/*
+	 * Callback methods are declared as static, because we want a native
+	 * function to call them asynchronously, with no reference to the current
+	 * object. Therefore our native functions will rely only on the Activity
+	 * class, and on its static methods.
+	 * 
+	 * For each callback method, we declare a (static, for the same reason as
+	 * before) Runnable object, that will be able to interact with the User
+	 * Interface from within the thread call. If we don't pass through this
+	 * mechanism, an exception will be thrown, because by default only the
+	 * generating thread can access to the View object, and not other threads
+	 * (as the *randomCaller wants to do, from native code.
+	 */
+
+	public void callback1() {
+		System.out.println("callback1 called");
+		handler.post(callback1Thread);
+	}
+
+	Runnable callback1Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
 			output.setText("callback 1, no params");
 		}
-  };
-  
-  public static int callback2(int param0, float param1, String param2) {
-	  System.out.println("callback2 called, params are: "+param0+" "+param1+" "+param2);
-	  int0 = param0;
-	  float0 = param1;
-	  string0 = param2;
-	  handler.post(callback2Thread);
-	  return 0;
-  }
-  
-  static Runnable callback2Thread = new Runnable() {
-		@Override
-		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
-			output.setText("callback 2, params are: "+int0+", "+float0+", "+string0);
-		}
-  };
-    
-  public static void callback3(String param0) {
-	  System.out.println("callback 3, param is: "+param0);
-	  string0 = param0;
-	  handler.post(callback3Thread);
-  }
+	};
 
-  static Runnable callback3Thread = new Runnable() {
+	public int callback2(int param0, float param1, String param2) {
+		System.out.println("callback2 called, params are: " + param0 + " "
+				+ param1 + " " + param2);
+		int0 = param0;
+		float0 = param1;
+		string0 = param2;
+		handler.post(callback2Thread);
+		return 0;
+	}
+
+	Runnable callback2Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
-			output.setText("callback 3, param is: "+string0);
+			output.setText("callback 2, params are: " + int0 + ", " + float0
+					+ ", " + string0);
 		}
-  };
-  
-  public static float callback4(float param0) {
-	  System.out.println("callback 4, param is: "+param0);
-	  float0 = param0;
-	  handler.post(callback4Thread);
-	  return param0;
-  }
-  
-  static Runnable callback4Thread = new Runnable() {
+	};
+
+	public void callback3(String param0) {
+		System.out.println("callback 3, param is: " + param0);
+		string0 = param0;
+		handler.post(callback3Thread);
+	}
+
+	Runnable callback3Thread = new Runnable() {
 		@Override
 		public void run() {
-			TextView output = (TextView)act.findViewById(R.id.output);
-			output.setText("callback 4, param is: "+float0);
+			output.setText("callback 3, param is: " + string0);
 		}
-  };
-  
-  public void run() {
-  //  this.handler.postDelayed(this, 2000);
-  }
-  
-  public native void init();
-  public native void foo1();
-  public native void foo2();
-  
-  static {
-      System.loadLibrary("tutorial2");
-  }
+	};
+
+	public float callback4(float param0) {
+		System.out.println("callback 4, param is: " + param0);
+		float0 = param0;
+		handler.post(callback4Thread);
+		return param0;
+	}
+
+	Runnable callback4Thread = new Runnable() {
+		@Override
+		public void run() {
+			output.setText("callback 4, param is: " + float0);
+		}
+	};
+
+	public void run() {
+
+	}
+
+	public native void init();
+
+	public native void foo1();
+
+	public native void foo2();
+
+	static {
+		System.loadLibrary("tutorial2");
+	}
 }
