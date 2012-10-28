@@ -1,3 +1,13 @@
+########################## NOTES ON TESTING BRANCH ############################
+
+This branch still exists because of its peculiar implementation of the native
+source file, which contains the creation of a custom Java object from within
+the native code.
+This example still needs to be used for a potential Tutorial4 (or Tutorial2b)
+which will be presented along with the others into the documentation.
+
+###############################################################################
+
 Tutorials to explore JNI calls into Android environment, through the ndk development kit.
 
 How to make it work:
