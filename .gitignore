@@ -37,3 +37,10 @@ tutorial3/res/drawable-hdpi/
 tutorial3/res/drawable-ldpi/
 tutorial3/res/drawable-mdpi/
 tutorial3/res/drawable-xhdpi/
+documentation/Makefile
+documentation/Report.aux
+documentation/Report.bbl
+documentation/Report.bib.bak
+documentation/Report.blg
+documentation/Report.log
+documentation/Report.synctex.gz

@@ -1,0 +1,167 @@
+% VDE Template for EUSAR Papers
+% Provided by Barbara Lang und Siegmar Lampe
+% University of Bremen, January 2002
+% English version by Jens Fischer
+% German Aerospace Center (DLR), December 2005
+% Additional modifications by Matthias Wei{\ss}
+% FGAN, January 2009
+
+%-----------------------------------------------------------------------------
+% Type of publication
+\documentclass[a4paper,10pt]{article}
+%-----------------------------------------------------------------------------
+% Other packets: Most packets may be downloaded from www.dante.de and
+% "tcilatex.tex" can be found at (December 2005):
+% http://www.mackichan.com/techtalk/v30/UsingFloat.htm
+% Not all packets are necessarily needed:
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+%\usepackage{ngerman} % in german language if required
+\usepackage[nooneline,bf]{caption} % Figure descriptions from left margin
+\usepackage{times}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{nameref}
+\usepackage{url}
+\usepackage{inconsolata}
+\usepackage[firstpage]{draftwatermark}
+\SetWatermarkLightness{0.9}
+%\usepackage{paralist}
+
+\input{tcilatex}
+%-------------------------------------------------------------------------------
+% Page Setup
+\textheight24cm \textwidth17cm \columnsep6mm
+\oddsidemargin-5mm                 % depending on print drivers!
+\evensidemargin-5mm                % required margin size: 2cm
+\headheight0cm \headsep0cm \topmargin0cm \parindent0cm
+\pagestyle{empty}                  % delete footer and header
+%------------------------------------------------------------------------------
+% Environment definitions
+\newenvironment*{mytitle}{\begin{LARGE}\bf}{\end{LARGE}\\}%
+\newenvironment*{mysubtitle}{\bf}{\\[1.5ex]}%
+\newenvironment*{myabstract}{\begin{Large}\bf}{\end{Large}\\[2.5ex]}%
+%-------------------------------------------------------------------------------
+% Using Pictures and tables:
+% - Instead "table" write "tablehere" without parameters
+% - Instead "figure" write "figurehere " without parameters
+% - Please insert a blank line before and after \begin{figuerhere} ... \end{figurehere}
+%
+% CAUTION:   The first reference to a figure/table in the text should be formatted fat.
+%
+
+\makeatletter
+\newenvironment{tablehere}{\def\@captype{table}}{}
+\newenvironment{figurehere}{\def\@captype{figure}\vspace{2ex}}{\vspace{2ex}}
+\makeatother
+
+\newenvironment{packeditems}{
+\begin{itemize}
+  \setlength{\itemsep}{3pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{itemize}}
+
+\newenvironment{packedenum}{
+\begin{enumerate}
+  \setlength{\itemsep}{3pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{enumerate}}
+
+\newenvironment{packeddesc}{
+\begin{description}
+  \setlength{\itemsep}{3pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+}{\end{description}}
+
+\definecolor{lightblue}{rgb}{0.0,0.0,0.7}
+\definecolor{lightgrey}{rgb}{0.6,0.6,0.6}
+
+\newcommand{\iic}{I\textsuperscript{2}C }
+\newcommand{\keyword}[1]{\texttt{#1}}
+\newcommand{\reff}[1]{\textbf{Figure~\ref{#1}}}
+\newcommand{\reft}[1]{\textbf{Table~\ref{#1}}}
+\newcommand{\refl}[1]{\textbf{Listing~\ref{#1}}}
+
+% lstlisting global parameters
+\lstset{
+	language=C,
+	basicstyle=\scriptsize\ttfamily,
+	keywordstyle=\color{lightblue},
+	commentstyle=\color{lightgrey},
+	captionpos=b,	% caption at the bottom of listing
+	xleftmargin=6pt,
+	xrightmargin=6pt,
+	framexleftmargin=4pt,
+	framexrightmargin=4pt,
+	aboveskip=12pt,
+	belowskip=12pt
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% Please use capital letters in the beginning of important words as for example
+\begin{mytitle}A safari walk-through into JNI within Android\texttrademark \ OS\end{mytitle}
+\begin{mysubtitle}
+Exploiting JNI capabilities taking advantage of Android\texttrademark \ NDK
+\end{mysubtitle}
+%
+% Please do not insert a line here
+%
+\\
+Antonio Troina\\
+Matr. 708267, (antonio.troina@mail.polimi.it)\\
+\hspace{10ex}
+\begin{flushright}
+\emph{Introductory report for the M.Sc. thesis in Computer Science Engineering}\\
+\emph{Reviser: PhD. Patrick Bellasi (bellasi@elet.polimi.it)}
+\end{flushright}
+
+Last update: \today
+\\
+\hspace{10ex}
+
+%-------------------------------------------------------------------------------
+\begin{myabstract} Abstract \end{myabstract}
+This article aims to briefly describe, in the form of some simple and annotated tutorials, how a developer can take advantage of some JNI capabilities under Android operating system to let the Java and Native environments communicate to each other. This operation has been made quite easy by the Android's native development kit (NDK). Special attention will be given to the callback mechanism, which is by far the most complex, nevertheless the most challenging, under the developer's point of view.
+
+\vspace{6ex}	% Please do not remove or reduce this space here.
+\begin{multicols}{2}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+The coming of Android in the smart-phones' market would suggest that Java is definitely enough to rule this galaxy. Moreover, lately, the little-green-robot's operative system has approached, silently but firmly, to the embedded world which, typically, wasn't famous for being dominated by the Java language, particularly for it's performance-oriented needs. This being said, except for the peculiar case of the \textit{JIT-ed} code, who's responsible of connecting the high-level Java application layer to the native world, and the other way around? Yes, this interface is JNI, which was initially released in early 1997. So far, some basics examples are available (mainly on-line) which, however, are often more theoretical than practical, therefore this article is meant to be a concrete hands-on guide, to discover - some of - the secrets behind this powerful instrument which is JNI. 
+
+%------------------------------------------------------------------------------
+\subsection{Subsection}
+\label{sec:subs1}
+Subsection body
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Conclusion}
+
+%This report and all the source code are publicly available through the git
+%repository at \url{https://github.com/thoeni/}.  
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% No cited references 
+\nocite{liang1999jni}
+\nocite{marakanajni}
+
+% We suggest the use of JabRef for editing your bibliography file (Report.bib)
+\bibliographystyle{splncs}
+\bibliography{Report}
+
+\end{multicols}
+\end{document}
