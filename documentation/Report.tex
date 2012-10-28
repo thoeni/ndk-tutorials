@@ -30,7 +30,7 @@
 \usepackage{url}
 \usepackage{inconsolata}
 \usepackage[firstpage]{draftwatermark}
-\SetWatermarkLightness{0.9}
+\SetWatermarkLightness{0.84}
 %\usepackage{paralist}
 
 \input{tcilatex}
@@ -132,27 +132,46 @@ Last update: \today
 
 %-------------------------------------------------------------------------------
 \begin{myabstract} Abstract \end{myabstract}
-This article aims to briefly describe, in the form of some simple and annotated tutorials, how a developer can take advantage of some JNI capabilities under Android operating system to let the Java and Native environments communicate to each other. This operation has been made quite easy by the Android's native development kit (NDK). Special attention will be given to the callback mechanism, which is by far the most complex, nevertheless the most challenging, under the developer's point of view.
+This article aims to briefly describe, in the form of some simple and annotated
+tutorials, how a developer can take advantage of some JNI capabilities under
+Android operating system to let the Java and Native environments communicate to
+each other. This operation has been made quite easy by the Android's native
+development kit (NDK). Special attention will be given to the callback mechanism, 
+which is by far the most complex, nevertheless the most challenging, under the
+developer's point of view.
 
 \vspace{6ex}	% Please do not remove or reduce this space here.
 \begin{multicols}{2}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
-The coming of Android in the smart-phones' market would suggest that Java is definitely enough to rule this galaxy. Moreover, lately, the little-green-robot's operative system has approached, silently but firmly, to the embedded world which, typically, wasn't famous for being dominated by the Java language, particularly for it's performance-oriented needs. This being said, except for the peculiar case of the \textit{JIT-ed} code, who's responsible of connecting the high-level Java application layer to the native world, and the other way around? Yes, this interface is JNI, which was initially released in early 1997. So far, some basics examples are available (mainly on-line) which, however, are often more theoretical than practical, therefore this article is meant to be a concrete hands-on guide, to discover - some of - the secrets behind this powerful instrument which is JNI. 
+The coming of Android in the smart-phones market would suggest that Java is
+definitely enough to rule this galaxy. Moreover, lately, the little-green-robot's
+operative system has approached, silently but firmly, to the embedded world
+which, typically, wasn't famous for being dominated by the Java language, 
+particularly for its performance-oriented needs. This being said, except for
+the peculiar case of the \textit{JIT-ed} code, who's responsible of connecting
+the high-level Java application layer to the native world, and the other way
+around? Yes, this interface is JNI, which was initially released in early 1997.
+So far, some basic examples are available (mainly on-line) which, however, are
+often more theoretical than practical, therefore this article is meant to be a
+concrete hands-on guide, to discover - some of - the secrets behind this powerful instrument which is JNI.
 
 %------------------------------------------------------------------------------
-\subsection{Subsection}
-\label{sec:subs1}
-Subsection body
+\subsection{JNI, Android and NDK}
+\label{sec:jni-android-ndk}
+JNI per se basically needs two components to be used: the \textit{javah} JDK
+tool, which builds c-style header files from a given Java class (that will be
+implemented afterwards in a proper native source file, which includes the
+mentioned header), and the \textit{jni.h} header file, which maps the Java types
+to their native counterparts.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{Conclusion}
+\section{Conclusions}
 
-%This report and all the source code are publicly available through the git
-%repository at \url{https://github.com/thoeni/}.  
-
+This report and all the source code are publicly available through the git
+repository at \url{https://github.com/thoeni/ndk-tutorials} or at \url{https://bitbucket.org/atroina/ndk-tutorials}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % No cited references 
