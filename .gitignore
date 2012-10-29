@@ -37,6 +37,7 @@ tutorial3/res/drawable-hdpi/
 tutorial3/res/drawable-ldpi/
 tutorial3/res/drawable-mdpi/
 tutorial3/res/drawable-xhdpi/
+tutorial3/.externalToolBuilders/
 documentation/Makefile
 documentation/Report.aux
 documentation/Report.bbl

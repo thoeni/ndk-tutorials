@@ -149,13 +149,20 @@ The coming of Android in the smart-phones market would suggest that Java is
 definitely enough to rule this galaxy. Moreover, lately, the little-green-robot's
 operative system has approached, silently but firmly, to the embedded world
 which, typically, wasn't famous for being dominated by the Java language, 
-particularly for its performance-oriented needs. That being said - except for
-the peculiar case of the \textit{JIT-ed} code - who's responsible for connecting
-the high-level Java application layer to the native world, and the other way
-around? Yes, this filling is JNI, which was initially released in early 1997.
+particularly for its performance-oriented needs. That being said, who's
+responsible for connecting the high-level Java application layer to the native
+world, and the other way around? Yes, this filling is JNI, which was initially
+released in early 1997. Doing so, the developer can achieve two main scopes: 
+reusing his native code under a Java environment, and optimising the execution
+with regard to performances, so that intensive operations can run natively, 
+instead of being interpreted, as Java pattern requires - except for the peculiar
+case of the \textit{JIT-ed} code, where the bytecode is compiled to run natively
+at a certain time (commonly at launch time, but can happen at install time, or 
+method invoke time).\\
 So far, some basic examples are available (mainly on-line) which, however, are
 often more theoretical than practical, therefore this article is meant to be a
-concrete hands-on guide, to discover - some of - the secrets behind this powerful instrument which is JNI.
+concrete hands-on guide, to discover - some of - the secrets behind this powerful
+instrument which is JNI.
 
 %------------------------------------------------------------------------------
 \subsection{JNI, Android and NDK}
@@ -179,7 +186,7 @@ java class
 
 \begin{figurehere}
  \centering
- \includegraphics[width=8cm]{./figures/jni-flow.png}
+ \includegraphics[width=8cm]{./figures/jni-flow.pdf}
  \caption{JNI flow}
  \label{fig:jni-flow}
 \end{figurehere}
@@ -189,6 +196,11 @@ therefore our starting point will be the Android NDK, which basically consists
 of a ready-to-use tool-set (available on \url{http://developer.android.com/tools/sdk/ndk/index.html#Downloads}). The use
 of the NDK condenses the steps above in just one main step, which will do almost
 everything at once, through the \keyword{ndk-build} command.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Getting started}
+\label{sec:getting-started}
+What
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
