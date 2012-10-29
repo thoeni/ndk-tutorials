@@ -149,10 +149,10 @@ The coming of Android in the smart-phones market would suggest that Java is
 definitely enough to rule this galaxy. Moreover, lately, the little-green-robot's
 operative system has approached, silently but firmly, to the embedded world
 which, typically, wasn't famous for being dominated by the Java language, 
-particularly for its performance-oriented needs. This being said, except for
-the peculiar case of the \textit{JIT-ed} code, who's responsible of connecting
+particularly for its performance-oriented needs. That being said - except for
+the peculiar case of the \textit{JIT-ed} code - who's responsible for connecting
 the high-level Java application layer to the native world, and the other way
-around? Yes, this interface is JNI, which was initially released in early 1997.
+around? Yes, this filling is JNI, which was initially released in early 1997.
 So far, some basic examples are available (mainly on-line) which, however, are
 often more theoretical than practical, therefore this article is meant to be a
 concrete hands-on guide, to discover - some of - the secrets behind this powerful instrument which is JNI.
@@ -164,8 +164,31 @@ JNI per se basically needs two components to be used: the \textit{javah} JDK
 tool, which builds c-style header files from a given Java class (that will be
 implemented afterwards in a proper native source file, which includes the
 mentioned header), and the \textit{jni.h} header file, which maps the Java types
-to their native counterparts.
+to their native counterparts. The whole flow (shown in Figure \ref{fig:jni-flow})
+mainly lies in four steps:
+\begin{itemize}
+\itemsep 0em
+\item implement a \textit{Java class}, declare the methods you want to call
+on the native environment as \keyword{native}, and compile it
+\item generate the header file through the \keyword{javah -jni} command
+\item implement as native C/C++ code the function whose signatures have been
+generated during the step above
+\item compile the file above as a shared library, which will be loaded by the
+java class
+\end{itemize}
 
+\begin{figurehere}
+ \centering
+ \includegraphics[width=8cm]{./figures/jni-flow.png}
+ \caption{JNI flow}
+ \label{fig:jni-flow}
+\end{figurehere}
+
+The focus of this work though points to explore JNI within the Android context,
+therefore our starting point will be the Android NDK, which basically consists
+of a ready-to-use tool-set (available on \url{http://developer.android.com/tools/sdk/ndk/index.html#Downloads}). The use
+of the NDK condenses the steps above in just one main step, which will do almost
+everything at once, through the \keyword{ndk-build} command.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Conclusions}
