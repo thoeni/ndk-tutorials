@@ -29,7 +29,8 @@
 \usepackage{nameref}
 \usepackage{url}
 \usepackage{inconsolata}
-\usepackage[firstpage]{draftwatermark}
+%\usepackage[firstpage]{draftwatermark}
+\usepackage{draftwatermark}
 \SetWatermarkLightness{0.84}
 %\usepackage{paralist}
 
@@ -152,13 +153,13 @@ which, typically, wasn't famous for being dominated by the Java language,
 particularly for its performance-oriented needs. That being said, who's
 responsible for connecting the high-level Java application layer to the native
 world, and the other way around? Yes, this filling is JNI, which was initially
-released in early 1997. Doing so, the developer can achieve two main scopes: 
-reusing his native code under a Java environment, and optimising the execution
+released in early 1997. With JNI, the developer can achieve two main goals: 
+reusing his native code within a Java environment, and optimising the execution
 with regard to performances, so that intensive operations can run natively, 
 instead of being interpreted, as Java pattern requires - except for the peculiar
-case of the \textit{JIT-ed} code, where the bytecode is compiled to run natively
-at a certain time (commonly at launch time, but can happen at install time, or 
-method invoke time).\\
+case of the \textit{JIT-ed} code, where the bytecode is compiled \textit{Just In 
+Time} to run natively (this operation commonly runs at launch time, but can
+happen at install time, or at method invoke time).\\
 So far, some basic examples are available (mainly on-line) which, however, are
 often more theoretical than practical, therefore this article is meant to be a
 concrete hands-on guide, to discover - some of - the secrets behind this powerful
@@ -198,11 +199,31 @@ of the NDK condenses the steps above in just one main step, which will do almost
 everything at once, through the \keyword{ndk-build} command.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Getting started}
 \label{sec:getting-started}
-What
+[Environment setup - NDK, Eclipse...]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tutorial1}
+\label{sec:tutorial1}
+[Tutorial1, direct call Java2C, simple example of callback]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tutorial2}
+\label{sec:tutorial2}
+[Tutorial2, callback from a native thread]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tutorial3}
+\label{sec:tutorial3}
+[Tutorial2, interaction Service - native thread, callback]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Conclusions}
 
 This report and all the source code are publicly available through the git
