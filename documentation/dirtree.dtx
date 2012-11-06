@@ -1,0 +1,804 @@
+% \iffalse
+%%
+%% Package `dirtree.dtx'
+%% -----------------------------------------------
+%% Copyright (C) 2004-2006 Jean-C\^ome Charpentier
+%% -----------------------------------------------
+%%
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%%   http://www.latex-project.org/lppl.txt
+%% and version 1.3 or later is part of all distributions of LaTeX
+%% version 2003/12/01 or later.
+%%
+%% See CTAN archives in directory macros/latex/base/lppl.txt.
+%%
+%% CONTENTS:
+%%   This work consists of the files dirtree.ins and dirtree.dtx.
+%%   Derived files are dirtree.tex and dirtree.sty.
+%%
+%% DESCRIPTION:
+%%   dirtree is a package displaying directory trees.
+%%
+% \fi
+% \iffalse
+%<latex-wrapper|tex> \def\fileversion{0.2}
+%<latex-wrapper|tex> \def\filedate{2006/01/25}
+%<*driver>
+\documentclass{ltxdoc}
+\GetFileInfo{dirtree.dtx}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage{xcolor}
+\usepackage{pstricks}
+\usepackage{dirtree}
+\newcommand*\package[1]{\textsf{#1}}
+\newcommand*\file[1]{\texttt{#1}}
+\AtBeginDocument{%
+  \OnlyDescription % comment out for implementation details
+  \EnableCrossrefs
+  \RecordChanges
+  \CodelineIndex}
+\AtEndDocument{
+  \PrintChanges
+  \PrintIndex}
+\hbadness=7000     % Over and under full box warnings
+\hfuzz=3pt
+\begin{document}
+  \DocInput{dirtree.dtx}
+\end{document}
+%</driver>
+% \fi
+%
+% \changes{v0.2}{\filedate}{dtx for CTAN, code for both Plain \TeX{}
+% and \LaTeX.}
+% \changes{v0.12}{2005/12/20}{\cs{DTbaselineskip}. local \cs{parskip},
+% \cs{baselineskip}, and \cs{strut} in order to fix a displaying bug.}
+% \changes{v0.11}{2005/12/19}{fix bug}
+% \changes{v0.01}{2004/08/10}{First realease to answer a question on
+% fctt.}
+%
+% \DoNotIndex{\@,\@gobble,\@latex@error,\@namedef,\@nameuse}
+% \DoNotIndex{\@ne,\@nil}
+% \DoNotIndex{\advance}
+% \DoNotIndex{\baselineskip,\box}
+% \DoNotIndex{\catcode,\count@,\csname}
+% \DoNotIndex{\def,\dimen,\dotfill,\dp}
+% \DoNotIndex{\edef,\else,\endcsname,\endgraf,\expandafter}
+% \DoNotIndex{\fi,\filedate,\fileversion}
+% \DoNotIndex{\hbox,\hrule,\hsize,\ht}
+% \DoNotIndex{\ifnum,\ifx,\input,\iterate}
+% \DoNotIndex{\kern}
+% \DoNotIndex{\leavevmode,\let,\long,\loop}
+% \DoNotIndex{\m@ne}
+% \DoNotIndex{\NeedsTeXFormat,\newcount,\newdimen,\next,\noindent}
+% \DoNotIndex{\par,\parindent,\parskip,\ProvidesFile,\ProvidesPackage}
+% \DoNotIndex{\relax,\repeat,\rm,\rmfamily}
+% \DoNotIndex{\setbox,\space,\strut}
+% \DoNotIndex{\the,\tt,\ttfamily}
+% \DoNotIndex{\vbox,\vrule,\vss}
+% \DoNotIndex{\z@}
+% \setcounter{IndexColumns}{2}
+%
+% \CheckSum{0}
+% \CharacterTable
+%  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
+%   Lower-case    \a\b\c\d\e\f\g\h\i\j\k\l\m\n\o\p\q\r\s\t\u\v\w\x\y\z
+%   Digits        \0\1\2\3\4\5\6\7\8\9
+%   Exclamation   \!     Double quote  \"     Hash (number) \#
+%   Dollar        \$     Percent       \%     Ampersand     \&
+%   Acute accent  \'     Left paren    \(     Right paren   \)
+%   Asterisk      \*     Plus          \+     Comma         \,
+%   Minus         \-     Point         \.     Solidus       \/
+%   Colon         \:     Semicolon     \;     Less than     \<
+%   Equals        \=     Greater than  \>     Question mark \?
+%   Commercial at \@     Left bracket  \[     Backslash     \\
+%   Right bracket \]     Circumflex    \^     Underscore    \_
+%   Grave accent  \`     Left brace    \{     Vertical bar  \|
+%   Right brace   \}     Tilde         \~}
+% 
+%  ................. Beginning of the documentation part .................
+% 
+% \title{The \package{dirtree} package\\Directory Tree}
+% \author{Jean-C\^ome
+% Charpentier\thanks{\texttt{Jean-Come.Charpentier@wanadoo.fr}}}
+% \date{Version \fileversion\ \filedate\ \\
+%       {\small Documentation revised \today}}
+%
+% \maketitle
+%
+% \begin{abstract}
+%   Package \package{dirtree} allows to display directory tree, like
+%   in the windows explorator.
+% \end{abstract}
+%
+% \tableofcontents
+% \section{Introduction}
+% During a discussion on fctt (\texttt{fr.comp.text.tex}) about
+% directory tree and how display such a structure, it appeared that
+% there wasn't many packages which do the job.
+%
+% One obvious solution is to use \package{PsTricks} but some people
+% don't like or don't know this package, so I made the first release
+% of \package{dirtree}.
+%
+% In fact, I didn't plan to send it in CTAN but Robin Fairbairns and
+% Danie was very convincing!
+%
+% \section{Usage}
+% Package \package{dirtree} works both on Plain \TeX{} and \LaTeX{}.
+% No surprise to call it:
+% \begin{verbatim}
+% \usepackage{dirtree}
+% \end{verbatim}
+% for \LaTeX{} (no option available) and
+% \begin{verbatim}
+% \input dirtree
+% \end{verbatim}
+% for Plain \TeX{}.
+%
+% \begin{DescribeMacro}{\dirtree}
+% The main macro is |\dirtree| which take one argument (the tree
+% structure). This tree structure is a sequence of
+% \begin{verbatim}
+% .<level><space><text node>.<space>
+% \end{verbatim}
+% Note that there is a dot in the beginning and another one at the end
+% of each node specification. The spaces are very important: if you
+% forgot the space before the |level| there will be an error and if
+% you forgot the space after the last dot, you don't indicate the end
+% of the node. Since an end of line is like a space for \TeX{}, I
+% recommand to write a node per line in the source file: it's handy
+% and more readeable.
+%
+% The |level| indicates the node depth in the tree. There is two
+% rules you must respect:
+% \begin{enumerate}
+% \item The root must have the level one.
+% \item When you create a node, if the last node have the level $n$,
+% the created node must have a level between 2 and $n+1$.
+% \end{enumerate}
+% In fact, you can indicates a level greater than $n+1$ if one node
+% have a level $n$ somewhere in the tree but the result will be
+% strange!
+%
+% A node of level $n$ will be connected to the last node defined which
+% has a level lesser or equal to $n$.
+%
+% For example, the code
+% \begin{verbatim}
+% \dirtree{%
+%  .1 /.
+%  .2 bin.
+%  .2 home.
+%  .3 jeancome.
+%  .4 texmf.
+%  .5 tex.
+%  .6 latex.
+%  .7 dirtree.
+%  .3 jeancomeson.
+%  .3 jeancomedaughter.
+%  .2 usr.
+%  .3 bin.
+%  .3 games.
+%  .4 fortunes.
+%  .3 include.
+%  .3 local.
+%  .4 bin.
+%  .4 share.
+%  .5 texmf.
+%  .6 fonts.
+%  .6 metapost.
+%  .6 tex.
+%  .3 share.
+% }
+% \end{verbatim}
+% give the result
+% \dirtree{%^^A
+%  .1 /.
+%  .2 bin.
+%  .2 home.
+%  .3 jeancome.
+%  .4 texmf.
+%  .5 tex.
+%  .6 latex.
+%  .7 dirtree.
+%  .3 jeancomeson.
+%  .3 jeancomedaughter.
+%  .2 usr.
+%  .3 bin.
+%  .3 games.
+%  .4 fortunes.
+%  .3 include.
+%  .3 local.
+%  .4 bin.
+%  .4 share.
+%  .5 texmf.
+%  .6 fonts.
+%  .6 metapost.
+%  .6 tex.
+%  .3 share.
+% }
+%
+% Note the |%| after the left brace in the beginning: it's important
+% because the first character encountered must be a dot.
+%
+% \begin{DescribeMacro}{\DTstyle}
+% A text node is typeset with the command |\DTstyle|. Its default
+% value is |\ttfamily| when you are under \LaTeX{} and |\tt| when you
+% are under Plain \TeX{}. You can redefine this macro as you want,
+% it is used with the syntax |{\DTstyle{text node}}|, so you can use
+% both |\ttfamily| and |\texttt| for example.
+% \end{DescribeMacro}
+%
+% \begin{DescribeMacro}{\DTcomment}
+% The |\DTcomment| command allows to put text at the right side, with
+% leaders. The syntax is
+% \begin{verbatim}
+% \DTcomment{comment text}
+% \end{verbatim}
+% \begin{DescribeMacro}{\DTstylecomment}
+% The style of comment is defined by |\DTstylecomment|. Its default
+% value is |\rmfamilly| under \LaTeX{} and |\rm| under Plain \TeX{},
+% and it acts like |\DTstyle|.
+% Here is an example: the code
+% \begin{verbatim}
+% \renewcommand*\DTstylecomment{\rmfamily\color{green}\textsc}
+% \renewcommand*\DTstyle{\ttfamily\textcolor{red}}
+% \dirtree{%
+%  .1 /.
+%  .2 bin.
+%  .2 home.
+%  .3 jeancome.
+%  .4 texmf.
+%  .5 tex.
+%  .3 jeancomeson\DTcomment{Guillaume}.
+%  .3 jeancomedaughter\DTcomment{Mathilde}.
+%  .2 usr.
+%  .3 bin.
+% }
+% \end{verbatim}
+% give the result
+% \begingroup
+% \renewcommand*\DTstylecomment{\rmfamily\color{green}\textsc}
+% \renewcommand*\DTstyle{\ttfamily\textcolor{red}}
+% \dirtree{%^^A
+%  .1 /.
+%  .2 bin.
+%  .2 home.
+%  .3 jeancome.
+%  .4 texmf.
+%  .5 tex.
+%  .3 jeancomeson\DTcomment{Guillaume}.
+%  .3 jeancomedaughter\DTcomment{Mathilde}.
+%  .2 usr.
+%  .3 bin.
+% }
+% \endgroup
+% In this example we have used the \package{xcolor} package.
+% \end{DescribeMacro}
+% \end{DescribeMacro}
+%
+% You can build complex text node. For example, the code
+% \begin{verbatim}
+% \dirtree{%
+%  .1 /.
+%  .2 bin \ldots{} \begin{minipage}[t]{5cm}
+%                    This directory holds executable files (binary
+%                    files or link on binary files){.}
+%         \end{minipage}.
+%  .2 home \ldots{} \begin{minipage}[t]{5cm}
+%                     jeancome\\
+%                     guillaume\\
+%                     mathilde\\
+%                   \end{minipage}.
+%  .4 texmf.
+% }
+% \end{verbatim}
+% give the result
+% \dirtree{%^^A
+%  .1 /.
+%  .2 bin \ldots{} \begin{minipage}[t]{5cm}
+%                    This directory holds executable files (binary
+%                    files or link on binary files){.}
+%         \end{minipage}.
+%  .2 home \ldots{} \begin{minipage}[t]{5cm}
+%                     jeancome\\
+%                     guillaume\\
+%                     mathilde\\
+%                   \end{minipage}.
+%  .4 texmf.
+% }
+% We don't encourage to try too complicated code. Package
+% \package{dirtree} is still fragile! Note that we pay attention to
+% use optional parameter |[t]| in order to have a right vertical
+% alignment with horizontal rules.
+%
+% \begin{DescribeMacro}{\DTsetlength}
+% Some dimensions can be changed using the |\DTsetlength| command. The
+% syntax is:
+% \begin{verbatim}
+% \DTsetlength{offset}{width}{sep}{rule-width}{dot-size}
+% \end{verbatim}
+% \begin{center}
+%   \begin{pspicture}(0,0)(8,4)
+%     \psset{linewidth=3pt}
+%     \psline(1,0)(1,4)
+%     \psline(1,2)(2.5,2)
+%     \psline(3.5,0)(3.5,1.75)
+%     \psset{linewidth=0.4pt}
+%     \rput[bl](3,2){\framebox{\LARGE Text node}}
+%     \psframe*(0.75,1.75)(1.25,2.25)
+%     \psset{linewidth=0.2pt}
+%     \psline{<->}(0.5,1.75)(0.5,2.25)
+%     \uput[l](0.5,2){\scriptsize \ttfamily dot-size}
+%     \psline{<->}(1,2.5)(2.5,2.5)
+%     \uput[u](1.75,2.5){\scriptsize \ttfamily width}
+%     \psline{<->}(2.5,2)(3,2)
+%     \uput[u](2.75,2){\scriptsize \ttfamily sep}
+%     \psline{<->}(3,1.5)(3.5,1.5)
+%     \uput[d](3,1.5){\scriptsize \ttfamily offset}
+%   \end{pspicture}
+% \end{center}
+% The default value are:
+% \begin{itemize}
+% \item \texttt{offset = 0.2em}
+% \item \texttt{width = 1em}
+% \item \texttt{sep = 0.2em}
+% \item \texttt{rule-width = 0.4pt}
+% \item \texttt{dot-size = 1.6pt}
+% \end{itemize}
+%
+% \begin{DescribeMacro}{\DTbaselineskip}
+% The last length parameter is |\DTbaselineskip| which indicates the
+% skip between lines of the tree.
+% \end{DescribeMacro}
+%
+% If we typeset the first example with
+% \begin{verbatim}
+% \setlength{\DTbaselineskip}{20pt}
+% \DTsetlength{1em}{3em}{0.1em}{1pt}{4pt}
+% \end{verbatim}
+% we obtain the (strange) result:
+% \begingroup
+% \setlength{\DTbaselineskip}{20pt}
+% \DTsetlength{1em}{3em}{0.1em}{1pt}{4pt}
+% \dirtree{%^^A
+%  .1 /.
+%  .2 bin.
+%  .2 home.
+%  .3 jeancome.
+%  .4 texmf.
+%  .5 tex.
+%  .6 latex.
+%  .7 dirtree.
+%  .3 jeancomeson.
+%  .3 jeancomedaughter.
+%  .2 usr.
+%  .3 bin.
+%  .3 games.
+%  .4 fortunes.
+%  .3 include.
+%  .3 local.
+%  .4 bin.
+%  .4 share.
+%  .5 texmf.
+%  .6 fonts.
+%  .6 metapost.
+%  .6 tex.
+%  .3 share.
+% }
+% \endgroup
+% \end{DescribeMacro} %^^A of \DTsetlength
+% \end{DescribeMacro} %^^A of \dirtree
+%
+% Note that \package{dirtree} package is not able to split tree on
+% several pages. If this case occurs, the result will be very strange
+% with overfull rules.  I suppose that the best is to place such trees
+% inside floats.
+%
+% \section{ToDo}
+%
+% \begin{itemize}
+% \item Parameters with \package{xkeyval} syntax;
+% \item Command |\DTsplittree| to allows a tree to be typeseted on
+% several pages;
+% \item Style parameters to rules (color for example) and gap between
+% text and comment (by now it's |\dotfill|).
+% \item Dimension parameter |abovetreeskip| and |belowtreeskip|.
+% \end{itemize}
+%  .................... End of the documentation part ....................
+%
+%<*latex-wrapper>
+% \newpage
+% \section{\package{dirtree} \LaTeX{} Wrapper}
+% Nothing special here but the |\DT@fromsty| definition. This latter
+% is intended to check if \package{dirtree} is called under \LaTeX{}
+% (with |\usepackage|) or under Plain \TeX{}.
+%    \begin{macrocode}
+\NeedsTeXFormat{LaTeX2e}[1995/06/01]
+\ProvidesPackage{dirtree}[\filedate\space v\fileversion\space
+                          package wrapper for dirtree]
+\newcommand*\DT@fromsty{}
+\input{dirtree.tex}
+\ProvidesFile{dirtree.tex}
+  [\filedate\space v\fileversion\space `dirtree' (jcc)]
+%    \end{macrocode}
+%</latex-wrapper>
+%<*tex>
+% \newpage
+% \section{\package{dirtree} Code}
+% An ``hello'' message.
+%    \begin{macrocode}
+\message{`dirtree' v\fileversion, \filedate\space (jcc)}
+%    \end{macrocode}
+% Save at current catcode and make @ a letter
+%    \begin{macrocode}
+\edef\DTAtCode{\the\catcode`\@}
+\catcode`\@=11
+%    \end{macrocode}
+% Define |\LOOP|, |\REPEAT|, and |\ITERATE| like |\loop|, |\repeat|,
+% and |\iterate|. The uppercase form allows to place loop inside
+% loop.
+%    \begin{macrocode}
+\long\def\LOOP#1\REPEAT{%
+  \def\ITERATE{#1\relax\expandafter\ITERATE\fi}%
+  \ITERATE
+  \let\ITERATE\relax
+}
+\let\REPEAT=\fi
+%    \end{macrocode}
+% Define some \LaTeX{} macros if we work under Plain \TeX{}.
+% |\@namedef|-like for |\edef|.
+%    \begin{macrocode}
+\expandafter\ifx\csname DT@fromsty\endcsname\relax
+  \def\@namedef#1{\expandafter\def\csname #1\endcsname}
+  \def\@nameuse#1{\csname #1\endcsname}
+  \long\def\@gobble#1{}
+\fi
+\def\@nameedef#1{\expandafter\edef\csname #1\endcsname}
+%    \end{macrocode}
+% Offset between vertical rule below text and text left boundary.
+%    \begin{macrocode}
+\newdimen\DT@offset \DT@offset=0.2em
+%    \end{macrocode}
+% Length of horizontal rule.
+%    \begin{macrocode}
+\newdimen\DT@width \DT@width=1em
+%    \end{macrocode}
+% Gap between horizontal rule and text.
+%    \begin{macrocode}
+\newdimen\DT@sep \DT@sep=0.2em
+%    \end{macrocode}
+% |\DT@offset|$\null+\null$|\DT@width|$\null+\null$|\DT@sep|
+%    \begin{macrocode}
+\newdimen\DT@all
+\DT@all=\DT@offset
+\advance\DT@all \DT@width
+\advance\DT@all \DT@sep
+%    \end{macrocode}
+% Rule thickness
+%    \begin{macrocode}
+\newdimen\DT@rulewidth \DT@rulewidth=0.4pt
+%    \end{macrocode}
+% Size of square junction.
+%    \begin{macrocode}
+\newdimen\DT@dotwidth \DT@dotwidth=1.6pt
+%    \end{macrocode}
+% baselineskip inside tree.
+%    \begin{macrocode}
+\newdimen\DTbaselineskip \DTbaselineskip=\baselineskip
+%    \end{macrocode}
+% Max index node.
+%    \begin{macrocode}
+\newcount\DT@counti
+%    \end{macrocode}
+% Current index node
+%    \begin{macrocode}
+\newcount\DT@countii
+%    \end{macrocode}
+% |\DT@countiii|$\null=\null$|\DT@countii|$\null-1$. That is, Previous
+% index node.
+%    \begin{macrocode}
+\newcount\DT@countiii
+%    \end{macrocode}
+% Last node of a level lesser or equal to current one.
+%    \begin{macrocode}
+\newcount\DT@countiv
+%    \end{macrocode}
+% \begin{macro}{\DTsetlength}
+% |\DTsetlength| allows to define dimensions in use for the directory
+% tree (see above).
+%    \begin{macrocode}
+\def\DTsetlength#1#2#3#4#5{%
+  \DT@offset=#1\relax
+  \DT@width=#2\relax
+  \DT@sep=#3\relax
+%    \end{macrocode}
+% |\DT@all| is the width of a whole column.
+%    \begin{macrocode}
+  \DT@all=\DT@offset
+  \advance\DT@all by\DT@width
+  \advance\DT@all by\DT@sep
+  \DT@rulewidth=#4\relax
+  \DT@dotwidth=#5\relax
+}
+%    \end{macrocode}
+% \end{macro}
+% |\DTstyle| is the style used to typeset nodes. |\DTstylecomment| is
+% the style used to typeset comments. Since \TeX{} and \LaTeX{} are
+% very different, we test the format used before initializations.
+% \begin{macro}{\DTstyle}
+% \begin{macro}{\DTstylecomment}
+%    \begin{macrocode}
+\expandafter\ifx\csname DT@fromsty\endcsname\relax
+  \def\DTstyle{\tt}
+  \def\DTstylecomment{\rm}
+\else
+  \def\DTstyle{\ttfamily}
+  \def\DTstylecomment{\rmfamily}
+\fi
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+% \begin{macro}{\DTcomment}
+% |\DTcomment| places comment in a line of the tree.
+%    \begin{macrocode}
+\def\DTcomment#1{%
+  \kern\parindent\dotfill
+  {\DTstylecomment{#1}}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\dirtree}
+% |\dirtree| is the main package macro.
+%    \begin{macrocode}
+\def\dirtree#1{%
+%    \end{macrocode}
+% Change some parameters (save them before).
+%    \begin{macrocode}
+  \let\DT@indent=\parindent
+  \parindent=\z@
+  \let\DT@parskip=\parskip
+  \parskip=\z@
+  \let\DT@baselineskip=\baselineskip
+  \baselineskip=\DTbaselineskip
+  \let\DT@strut=\strut
+  \def\strut{\vrule width\z@ height0.7\baselineskip depth0.3\baselineskip}%
+%    \end{macrocode}
+% Read the argument and before that, initialize counters. |\DTcounti|
+% is the current index node.
+%    \begin{macrocode}
+  \DT@counti=\z@
+  \let\next\DT@readarg
+  \next#1\@nil
+%    \end{macrocode}
+% When |\DT@readarg| has done its job, the node levels and the node
+% texts are saved in |\DT@level@<index>| and |\DT@body@<index>|
+% respectively. |\DT@counti| holds the greater index. We can now
+% display the tree.
+%
+% Firstly, display the root. For that, the text is boxed.
+%    \begin{macrocode}
+  \dimen\z@=\hsize
+  \advance\dimen\z@ -\DT@offset
+  \advance\dimen\z@ -\DT@width
+  \setbox\z@=\hbox to\dimen\z@{%
+    \hsize=\dimen\z@
+    \vbox{\@nameuse{DT@body@1}}%
+  }%
+%    \end{macrocode}
+% We change the height and the depth of this box in order to have the
+% same total height and a height of |0.7\baselineskip|, that is, the
+% height of |\strut|.
+%    \begin{macrocode}
+  \dimen\z@=\ht\z@
+  \advance\dimen0 by\dp\z@
+  \advance\dimen0 by-0.7\baselineskip
+  \ht\z@=0.7\baselineskip
+  \dp\z@=\dimen\z@
+%    \end{macrocode}
+% Then we display this box with an indentation as if there had a level 0.
+%    \begin{macrocode}
+  \par\leavevmode
+  \kern\DT@offset
+  \kern\DT@width
+  \box\z@
+  \endgraf
+%    \end{macrocode}
+% Initialize index for the loop.
+%    \begin{macrocode}
+  \DT@countii=\@ne
+  \DT@countiii=\z@
+%    \end{macrocode}
+% |\dimen3| holds the height of the node in the tree. In fact, the
+% bottom of the node since this dimension is used to connect vertical
+% rules.
+%    \begin{macrocode}
+  \dimen3=\dimen\z@
+%    \end{macrocode}
+% |\DT@lastlevel@<level>| holds the baseline of the last node in level
+% |<level>|.
+%    \begin{macrocode}
+  \@namedef{DT@lastlevel@1}{-0.7\baselineskip}%
+%    \end{macrocode}
+% Loop for displaying the remainder of the tree.
+%    \begin{macrocode}
+  \loop
+%    \end{macrocode}
+% Exit loop when the last current index is lesser or equal to max
+% index.
+%    \begin{macrocode}
+  \ifnum\DT@countii<\DT@counti
+%    \end{macrocode}
+% |\DT@counti| holds current index and |\DT@countii| holds previous
+% index (just current index minus one).
+%    \begin{macrocode}
+    \advance\DT@countii \@ne
+    \advance\DT@countiii \@ne
+%    \end{macrocode}
+% Horizontal offset for the text:
+%
+% $(\mathtt{current\ level} - 1) \times \mathtt{DT@all} +
+% \mathtt{DT@offset}$.
+%    \begin{macrocode}
+    \dimen\z@=\@nameuse{DT@level@\the\DT@countii}\DT@all
+    \advance\dimen\z@ by\DT@offset
+    \advance\dimen\z@ by-\DT@all
+    \leavevmode
+    \kern\dimen\z@
+%    \end{macrocode}
+% Look for last node in previous level in order to know how connect
+% the current node.
+%    \begin{macrocode}
+    \DT@countiv=\DT@countii
+    \count@=\z@
+    \LOOP
+%    \end{macrocode}
+% Look for previous node
+%    \begin{macrocode}
+      \advance\DT@countiv \m@ne
+%    \end{macrocode}
+% Repeat until this previous node has a level lesser or equal to
+% current level.
+%    \begin{macrocode}
+      \ifnum\@nameuse{DT@level@\the\DT@countiv} >
+        \@nameuse{DT@level@\the\DT@countii}\relax
+      \else
+        \count@=\@ne
+      \fi
+    \ifnum\count@=\z@
+    \REPEAT
+%    \end{macrocode}
+% Now |\DT@countiv| holds the index node connected to current node.
+%
+% We box the text node.
+%    \begin{macrocode}
+    \edef\DT@hsize{\the\hsize}%
+%    \end{macrocode}
+%    \begin{macrocode}
+    \count@=\@nameuse{DT@level@\the\DT@countii}\relax
+%    \end{macrocode}
+% Since text node is vboxed, we use a |\hsize| minus horizontal
+% current offset.
+%    \begin{macrocode}
+    \dimen\z@=\count@\DT@all
+    \advance\hsize by-\dimen\z@
+    \setbox\z@=\vbox{\@nameuse{DT@body@\the\DT@countii}}%
+%    \end{macrocode}
+% Restore |\hsize|.
+%    \begin{macrocode}
+    \hsize=\DT@hsize
+%    \end{macrocode}
+% Change height and depth in such a way that height is
+% |0.7\DT@baselineskip| (that is, the |\strut| height), and total
+% height is unchanged.
+%    \begin{macrocode}
+    \dimen\z@=\ht\z@
+    \advance\dimen\z@ by\dp\z@
+    \advance\dimen\z@ by-0.7\baselineskip
+    \ht\z@=0.7\baselineskip
+    \dp\z@=\dimen\z@
+%    \end{macrocode}
+% Save the height of the box in tree. The last node is the last node
+% in its level!
+%    \begin{macrocode}
+    \@nameedef{DT@lastlevel@\the\DT@countii}{\the\dimen3}%
+%    \end{macrocode}
+% |\dimen3| holds the vertical position of the bottom.
+%    \begin{macrocode}
+    \advance\dimen3 by\dimen\z@
+    \advance\dimen3 by0.7\baselineskip
+%    \end{macrocode}
+% Display vertical rule
+%    \begin{macrocode}
+    \dimen\z@=\@nameuse{DT@lastlevel@\the\DT@countii}\relax
+    \advance\dimen\z@ by-\@nameuse{DT@lastlevel@\the\DT@countiv}\relax
+    \advance\dimen\z@ by0.3\baselineskip
+%    \end{macrocode}
+% If this vertical rule connect two nodes which have different level,
+% the rule must be reduced by |0.5\baselineskip| (the rule don't rise
+% up to the baselineskip of the connected node).
+%    \begin{macrocode}
+    \ifnum\@nameuse{DT@level@\the\DT@countiv} <
+        \@nameuse{DT@level@\the\DT@countii}\relax
+      \advance\dimen\z@ by-0.5\baselineskip
+    \fi
+%    \end{macrocode}
+% Display vertical rule
+%    \begin{macrocode}
+    \kern-0.5\DT@rulewidth
+    \hbox{\vbox to\z@{\vss\hrule width\DT@rulewidth height\dimen\z@}}%
+    \kern-0.5\DT@rulewidth
+%    \end{macrocode}
+% Display square junction.
+%    \begin{macrocode}
+    \kern-0.5\DT@dotwidth
+    \vrule width\DT@dotwidth height0.5\DT@dotwidth depth0.5\DT@dotwidth
+    \kern-0.5\DT@dotwidth
+%    \end{macrocode}
+% Display horizontal rule and gap between horizontal rule and text node.
+%    \begin{macrocode}
+    \vrule width\DT@width height0.5\DT@rulewidth depth0.5\DT@rulewidth
+    \kern\DT@sep
+%    \end{macrocode}
+% Display text node.
+%    \begin{macrocode}
+    \box\z@
+%    \end{macrocode}
+% New paragraph for next node.
+%    \begin{macrocode}
+    \endgraf
+  \repeat
+%    \end{macrocode}
+% Restore indentation,  paragraph skip, and |\strut|.
+%    \begin{macrocode}
+  \parindent=\DT@indent
+  \parskip=\DT@parskip
+  \DT@baselineskip=\baselineskip
+  \let\strut\DT@strut
+}
+%    \end{macrocode}
+% \end{macro}
+% \begin{macro}{\DT@readarg}
+% The first processing step is to read the whole tree. It's a
+% recursive macro: each call process one node, that is, a
+% \begin{verbatim}
+% .<index> <text node>.<space>
+% \end{verbatim}
+% in the source file.
+%    \begin{macrocode}
+\def\DT@readarg.#1 #2. #3\@nil{%
+%    \end{macrocode}
+% |\DT@counti| is the current index.
+%    \begin{macrocode}
+  \advance\DT@counti \@ne
+%    \end{macrocode}
+% save level node in |\DT@level@<index>| and text node in
+% |\DT@body@<index>|. Two \package{dirtree} |\strut| are added to text
+% node in order to ensure a right vertical alignment, according to
+% \package{dirtree} |\baselineskip|
+%    \begin{macrocode}
+  \@namedef{DT@level@\the\DT@counti}{#1}%
+  \@namedef{DT@body@\the\DT@counti}{\strut{\DTstyle{#2}\strut}}%
+%    \end{macrocode}
+% If |#3| is not empty, it contains the remainder nodes and macro
+% calls itself. Otherwise, recursive call is stopped.
+%    \begin{macrocode}
+  \ifx\relax#3\relax
+    \let\next\@gobble
+  \fi
+  \next#3\@nil
+}
+%    \end{macrocode}
+% \end{macro}
+% Restore at catcode.
+%    \begin{macrocode}
+\catcode`\@=\DTAtCode\relax
+%    \end{macrocode}
+%</tex>
+% \endinput

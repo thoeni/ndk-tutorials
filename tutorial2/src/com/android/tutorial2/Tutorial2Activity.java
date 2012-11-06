@@ -27,11 +27,11 @@ public class Tutorial2Activity extends Activity implements Runnable {
 	private TextView output;
 	private Handler handler;
 
-	// The three following variables have been declared static to be accessed
-	// from within the static runnable callback methods run() below.
-	static int int0;
-	static float float0;
-	static String string0;
+	// The three following variables have been declared as global to be
+	// accessed from within the runnable callback methods run() below.
+	int int0;
+	float float0;
+	String string0;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

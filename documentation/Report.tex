@@ -29,8 +29,9 @@
 \usepackage{nameref}
 \usepackage{url}
 \usepackage{inconsolata}
-%\usepackage[firstpage]{draftwatermark}
-\usepackage{draftwatermark}
+\usepackage{dirtree}
+\usepackage[firstpage]{draftwatermark}
+%\usepackage{draftwatermark}
 \SetWatermarkLightness{0.84}
 %\usepackage{paralist}
 
@@ -84,12 +85,16 @@
 
 \definecolor{lightblue}{rgb}{0.0,0.0,0.7}
 \definecolor{lightgrey}{rgb}{0.6,0.6,0.6}
+\definecolor{gray}{rgb}{0.4,0.4,0.4}
+\definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+\definecolor{cyan}{rgb}{0.0,0.6,0.6}
 
 \newcommand{\iic}{I\textsuperscript{2}C }
 \newcommand{\keyword}[1]{\texttt{#1}}
 \newcommand{\reff}[1]{\textbf{Figure~\ref{#1}}}
 \newcommand{\reft}[1]{\textbf{Table~\ref{#1}}}
 \newcommand{\refl}[1]{\textbf{Listing~\ref{#1}}}
+\newcommand{\refs}[1]{\textbf{Section~\ref{#1}}}
 
 % lstlisting global parameters
 \lstset{
@@ -106,6 +111,17 @@
 	belowskip=12pt
 }
 
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{darkblue},
+  keywordstyle=\color{cyan},
+  morekeywords={xmlns,version,type,string,Button,application,activity,
+  intent-filter,manifest}% list your attributes here
+}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
@@ -172,7 +188,7 @@ JNI per se basically needs two components to be used: the \textit{javah} JDK
 tool, which builds c-style header files from a given Java class (that will be
 implemented afterwards in a proper native source file, which includes the
 mentioned header), and the \textit{jni.h} header file, which maps the Java types
-to their native counterparts. The whole flow (shown in Figure \ref{fig:jni-flow})
+to their native counterparts. The whole flow (shown in \reff{fig:jni-flow})
 mainly lies in four steps:
 \begin{itemize}
 \itemsep 0em
@@ -202,26 +218,677 @@ everything at once, through the \keyword{ndk-build} command.
 
 \section{Getting started}
 \label{sec:getting-started}
-[Environment setup - NDK, Eclipse...]
+Basically, to develop an "App" using the NDK, we need:
+\begin{itemize}
+\item Android SDK (\url{http://developer.android.com/sdk/index.html})
+\item Android NDK (\url{http://developer.android.com/tools/sdk/ndk/index.html})
+\item A source editor. Using Eclipse IDE for Java Developers automatises somehow the building process. (\url{http://www.eclipse.org/downloads/})
+\end{itemize}
+From within the \textit{"SDK/tools"} directory, you can execute the \keyword{android} command, to launch the Android SDK Manager: from here, you can download Android API and Extras.\\
+The Eclipse version you've downloaded will be a plain version, not yet customised to deal with specific Android needs and options: you then need to set up Android Tools for Eclipse by clicking \textit{"Help -> Install new software"} and putting the url \url{https://dl-ssl.google.com/android/eclipse/}.\\
+Once the environment is set up, we are ready to start developing our fist, small, application, which will interact with a native c-written library. Instead of editing the java source code, and the native code separately, and then compiling them as shown in \reff{fig:jni-flow}, Eclipse will just (automatically) build the Java part, while we'll manually generate the native shared library (we'll see how to automatise this procedure at the end of this article).\\
+The entirety of the files we'll work on (mainly, and at least two) is organised as shown below:
+
+\dirtree{%
+.1 .
+.1 Tutorial1/.
+.2 AndroidManifest.xml.
+.2 jni/.
+.3 Android.mk.
+.3 tutorial1.c.
+.2 res/.
+.3 layout/.
+.4 main.xml.
+.3 values/.
+.4 strings.xml.
+.2 src/.
+.3 com/.
+.4 android/.
+.5 tutorial1/.
+.6 Tutorial1Activity.java.
+}
+Let's briefly analyse this structure, taking as example the \textbf{Tutorial1} at \refs{sec:tutorial1}.
+\paragraph{Manifest}
+\keyword{AndroidManifest.xml} is the file where the applications are described: here they declare the presence of content providers, services, required permissions and other elements.\\
+In this simple case, it contains the basic nodes, which are:
+\begin{itemize}
+\item \keyword{manifest}: here, under the \keyword{package}, the Java package is specified. We use \keyword{com.android.tutorial1}
+\item \keyword{uses-sdk}: here it's specified the minimum sdk version (we use API 16, which correspond to Android Jelly Bean)
+\item \keyword{application}: general information about the application, a human-readable application label, icons.
+\item \keyword{activity}: here we have the \keyword{android:name} full name of the activity (the java file), a \keyword{android:label} which is the name that will appear at the top of our running Activity, and the \keyword{<intent-filter>} node, which tells Android when this Activity should be run. Since our Tutorial1Activity will also be the one to be run after launch, we can declare this in the \keyword{<action>} node. When an App is called, Android looks for an activity that declares itself ready to resolve the \keyword{MAIN} action. In the second node, under the \keyword{<intent-filter>} node, we declare another attribute, which is \keyword{<category>}, where we specify that the category of our activity is \keyword{LAUNCHER}: this will allow the App to be launched from the Android desktop.
+\end{itemize}
+For the sake of clarity, the whole \keyword{AndroidManifest.xml} content is presented at \refl{lst:manifest-tut1}.
+
+\begin{lstlisting}[language=XML,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   commentstyle=\color{gray}\upshape,
+				   caption=AndroidManifest.xml for Tutorial1,
+				   label=lst:manifest-tut1]
+<manifest
+xmlns:android="http://schemas.android.com/apk/res/android"
+       package="com.android.tutorial1"
+       android:versionCode="1"
+       android:versionName="1.0">
+    <uses-sdk android:minSdkVersion="16" />
+    <application android:label="Tutorial1"
+                 android:debuggable="true">
+        <activity android:name=".Tutorial1Activity"
+        	   android:label="Tutorial1">
+            <intent-filter>
+                <action
+                android:name="android.intent.action.MAIN"/>
+                <category
+                android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+    </application>
+</manifest> 
+\end{lstlisting}
+\paragraph{Resources}
+The \keyword{res} directory, contains, at least, the following subdirectories:
+\begin{itemize}
+\item \keyword{layout/}: This folder contains Android user interface XML files.\\
+Without going into detail too much, here we can find each visible element that composes what we see on the screen: strings, buttons, tables, text fields, menus. An example of a button declaration can be seen below
+\begin{lstlisting}[language=XML,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   commentstyle=\color{gray}\upshape]
+<Button android:layout_width="fill_parent"
+	 android:layout_height="wrap_content"
+	 android:id="@+id/button0"
+	 android:text="@string/button0"
+	 android:onClick="button0"/>
+\end{lstlisting}
+The \keyword{@+id/button0} and the \keyword{@string/button0} are references to other resources: the former will be used by the Java code to identify this specific button element, the latter identifies the value of the variable \keyword{button0} declared into the \keyword{strings.xml} file (see below)
+\item \keyword{values/}: This folder contains values that the application will read during its execution, or static data an application will use for such purposes as internationalization of UI strings. In the \keyword{string.xml} file, we can declare the values corresponding to the \keyword{@string} definition, as shown below, for the \keyword{@string/button0} declared above:
+\begin{lstlisting}[language=XML,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   commentstyle=\color{gray}\upshape]
+<string name="button0">Call to native</string>
+\end{lstlisting}
+\end{itemize}
+These xml files will then be automatically built into an \keyword{R} object, visible to the activity, which will access to it and get views, and set values on its attributes.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Tutorial1}
 \label{sec:tutorial1}
-[Tutorial1, direct call Java2C, simple example of callback]
+The complete code from this tutorial can be found at \url{https://github.com/thoeni/ndk-tutorials/tree/master/tutorial1}.\\
+Eventually, after this brief introduction, we can get to the most interesting part of the tutorial: the Java activity, and the native code, which are respectively placed into the \keyword{src} and the \keyword{jni} directories.\\
+The activity isn't any different from a regular Android activity except for two things: methods that correspond to native functions are declared as \keyword{native}, and a shared library is statically loaded by the \keyword{System.loadLibrary()} method.\\
+Basically, this tutorial, illustrates how to call a native function from within the Java activity, and how to call the native function which, in turn, calls back the Java activity: the methods that perform these operations are, respectively \keyword{foo1(String)} and \keyword{foo2}, declared within the \keyword{Tutorial1Activity}, as shown in \refl{lst:tut1-java1}, line 1 and line 2.
+
+\begin{lstlisting}[language=Java,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of Tutorial1Activity.java,
+				   label=lst:tut1-java1]
+public native String foo1(String message);
+public native void foo2();
+  
+public void foo3Callback() {
+   String message = "foo3Callback called back by foo2";
+   output.setText(message);
+}
+  
+static {
+   System.loadLibrary("tutorial1");
+}
+\end{lstlisting}
+In the same piece of code, we can see - line 4 - a regular \keyword{public void} method, named \keyword{foo3Callback()} which will be called by the native code, and - line 9 - the static declaration to load the shared library that will be generated by the \keyword{ndk-build} command.\\
+For this first tutorial, we analyse entirely the native code. These are the basics of JNI, and later on, we won't need to specify everything this much: the C code can be seen at \refl{lst:tut1-c1}
+
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=tutorial1.c,
+				   label=lst:tut1-c1]
+#include <jni.h>
+#include <android/log.h>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define  LOG_TAG    "tutorial1"
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,
+				LOG_TAG,__VA_ARGS__)
+#define  LOGE(...)  __android_log_print(ANDROID_LOG_ERROR,
+				LOG_TAG,__VA_ARGS__)
+
+jstring Java_com_android_tutorial1_Tutorial1Activity_foo1(
+	JNIEnv* env, jobject thiz, jstring message) {
+   //To print out a char* we have to convert
+   //the jstring to char*
+   const char *nativeString = (*env)->GetStringUTFChars(env,
+				message, 0);
+   LOGI("foo1 called! Input parameter: %s", nativeString);
+   //Then we have to release the memory allocated for
+   //the string
+   (*env)->ReleaseStringUTFChars(env, message, nativeString);
+   return (*env)->NewStringUTF(env, "JNI call J2C performed!");
+}
+
+void Java_com_android_tutorial1_Tutorial1Activity_foo2(
+	JNIEnv* env, jobject thiz) {
+   LOGI("foo2 called!");
+   //Get class from the calling object
+   jclass clazz = (*env)->GetObjectClass(env, thiz);
+   if (!clazz) {
+      LOGE("callback_handler: failed to get object Class");
+      goto failure;
+   }
+   //Get the methodID from the class which the calling
+   //object belongs
+   jmethodID method = (*env)->GetMethodID(env, clazz,
+   			"foo3Callback", "()V");
+   if (!method) {
+      LOGE("callback_handler: failed to get method ID");
+      goto failure;
+   }
+   //Call the method on the calling object, defined by the
+   //methodID
+   (*env)->CallVoidMethod(env, thiz, method);
+
+   failure: return;
+}
+\end{lstlisting}
+The first thing that we can see is the \keyword{\#include <jni.h>} at line 1: this is the header file - included with the JDK - that maps Java types to their native counterparts.\\
+There are two functions (line 14 and line 27): their names have a specific format which maps the full name of the "caller" Java class - where the \textit{underline} character replaces the typical Java \textit{dot notation} - and, at the end, there's the name of the function, which corresponds to the \keyword{native} method declared into our class.\\
+Let's take \keyword{foo1} as example: the method declaration in \refl{lst:tut1-java1}\textbf{:1} is natively implemented in \refl{lst:tut1-c1}\textbf{:14}. As it's done for the name, the input parameters and the return type have to match as well, therefore we have that the java \keyword{String} type is mapped to a native \keyword{jstring} type (thanks to the jni.h library that we included some lines above); the same goes for the input (\keyword{String/jstring} again), with a peculiarity: native functions mapped to Java methods through JNI paradigm always have two more parameters, a \keyword{JNIEnv*} which is a pointer to the current Java environment, and a \keyword{jobject} which is a reference to the caller object. Given this, depending on the variety of input(s) and of the output type, we're able to properly create the correct JNI function declaration: from now on, with some attentions, native code can freely run.\\
+In this tutorial I decided to pass a \keyword{String} as input to have the opportunity to show how the developer should proceed when she needs to handle variable types that are not primary ones. In this case, we have to explicitly convert the string from \keyword{jstring} to a \textit{"native-friendly"} \keyword{char*}: if you don't, the error is sometimes not as verbose as you would expect it to be, and it's quite hard to debug this situation, therefore pay attention to the Java/native types mismatch. As the reader can easily understand, we declare a native string, which will save the result of the right-hand side function (\refl{lst:tut1-c1}\textbf{:18}) \keyword{GetStringUTFChars} which obtains string characters represented in the Unicode format. The third parameter indicates whether we want a copy, or the pointer to the actual java string: in the latter case, the developer must pay attention not to modify the contents of the returned string. This parameter is typically set to NULL, and the JVM will autonomously determine the choice to pick.\\
+We can finally log our parameter as \textit{information}. When the native code finishes using the UTF-8 string obtained through GetStringUTFChars, it calls ReleaseStringUTFChars, thus the memory taken by the UTF-8 string can be freed.\\
+To satisfy the return type declared for this \keyword{foo1}, we return a new string. The procedure shown at \refl{lst:tut1-c1}\textbf{:24} is specific for generating a jstring object: we'll see further in this article that from the native code we are able to find java classes, instantiate them as jobjects, and call methods on them.\\
+\keyword{foo2} function represents a very simple example of a JNI callback: typically, whenever we need to callback a Java method implemented into the class that made the call, we go through three main steps:
+\begin{itemize}
+\item get the class (\keyword{jclass}), starting from the object (\keyword{jobject}) which made the call, through the \keyword{GetObjectClass} \refl{lst:tut1-c1}\textbf{:31}
+\item get the method identifier, through the \keyword{GetMethodID}, which performs a lookup for the method in the given class. The lookup is based on
+the name and type descriptor of the method. If the method does not exist, \keyword{GetMethodID} returns \keyword{NULL} \refl{lst:tut1-c1}\textbf{:38}
+\item call the method, on the caller object, passing the \keyword{methodID} \refl{lst:tut1-c1}\textbf{:46}
+\end{itemize}
+The code in \refl{lst:tut1-c1}\textbf{:27-49} is easy to read, despite for a detail that we are going to analyse: at line 38, the \keyword{GetMethodID} function, takes as input 4 parameters:
+\begin{itemize}
+\item \keyword{JNIEnv*}, the pointer to the Java environment
+\item \keyword{jobject}, the caller object, that we passed to the native function as input parameter
+\item \keyword{const char*}, the string which identifies the name of the method to call back
+\item \keyword{const char*}, the "signature" of the method, called the method descriptor: despite it could seem bizarre, it's very easy to understand. The first part, between the round brackets, represents the input parameters, and their types; the last identifier, after the closed round bracket, represents the return type. In our case, \keyword{()V} means \keyword{void foo3Callback()}. If our function was, let's say, \keyword{float foo3Callback(int i)} we would write, as its descriptor: \keyword{(I)F}. And, again, with \keyword{float foo3Callback(int i, float f, int j)} we would write \keyword{(IFI)F}. We will see how to declare complex descriptors, with strings, objects and arrays further
+\end{itemize}
+We still miss the last step, which allows the Java class to load the shared native library: the native code needs to be compiled by the \keyword{ndk-build} command. Before doing this, we have to create the \keyword{Android.mk} into the \keyword{jni} directory. The content of this file, for this tutorial, is shown at \refl{lst:tut1-c2}: after defining the name of the module that will be compiled, its source file, and local libs that we want to use, through the \keyword{include \$(BUILD\_SHARED\_LIBRARY)} instruction, we tell the compiler to create the shared object. Doing so, this library will be available to be loaded by Java classes. The use of \keyword{ndk-build} command is highly suggested, since it will generate all the files and folders that our environment needs.
+
+\begin{lstlisting}[language=make,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Android.mk for tutorial1.c,
+				   label=lst:tut1-c2]
+LOCAL_PATH:= $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_MODULE    := tutorial1
+LOCAL_CFLAGS    := -Werror
+LOCAL_SRC_FILES := tutorial1.c
+LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
+
+include $(BUILD_SHARED_LIBRARY)
+\end{lstlisting}
+
+An example of the activity performing a callback can be found at \reff{fig:tut1-scr1}: the output visible at the top of the screen comes from the Java method at \refl{lst:tut1-java1}\textbf{:5}\\
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=6cm]{./figures/tut1-scr1.png}
+ \caption{Tutorial1 performing a callback}
+ \label{fig:tut1-scr1}
+\end{figurehere}
+
+So far we introduced the main components needed to develop within the Android NDK, and we saw a simple example where an activity calls - and is called back by - a native function.\\
+In the next section, we'll add some features to this first example.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Tutorial2}
 \label{sec:tutorial2}
-[Tutorial2, callback from a native thread]
+The complete code from this tutorial can be found at \url{https://github.com/thoeni/ndk-tutorials/tree/master/tutorial2}.\\
+Often we deal with threads, and we want to implement asynchronous calls from native to Java environment. Asynchronous calls are easy to do when the direction is Java to native, while the other way around - implemented through the callback mechanism - isn't that easy to figure out.\\
+This example will consist of basic activity (almost identical to the one we used for \textit{Tutorial1}), that will be able to "run" and "stop" a routine. This routine will consist of a loop of four different callbacks, that will run into a thread: the loop exit condition is based on a flag that will be set and unset by the activity.\\
+In addition to the basic blocks we saw for \textit{Tutorial1} at \refl{lst:tut1-java1}, we can find at \refl{lst:tut2-java1} the lines relevant to understand how \textit{Tutorial2} performs.
+\begin{lstlisting}[language=Java,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of Tutorial2Activity.java source code,
+				   label=lst:tut2-java1]
+int int0;
+float float0;
+String string0;
+
+public void onCreate(Bundle savedInstanceState) {
+   // [...]
+   init();
+   handler = new Handler();
+}
+
+// [...]
+
+public void callback1() {
+   System.out.println("callback1 called");
+   handler.post(callback1Thread);
+}
+
+Runnable callback1Thread = new Runnable() {
+   @Override
+   public void run() {
+      output.setText("callback 1, no params");
+   }
+};
+
+public int callback2(int param0, float param1,
+                        String param2) {
+   System.out.println("callback2 called, params are: "
+      + param0 + " " + param1 + " " + param2);
+   int0 = param0;
+   float0 = param1;
+   string0 = param2;
+   handler.post(callback2Thread);
+   return 0;
+}
+
+Runnable callback2Thread = new Runnable() {
+   @Override
+   public void run() {
+      output.setText("callback 2, params are: "
+         + int0 + ", " + float0 + ", " + string0);
+   }
+};
+
+public void callback3(String param0) {
+   System.out.println("callback 3, param is: "
+      + param0);
+   string0 = param0;
+   handler.post(callback3Thread);
+}
+
+Runnable callback3Thread = new Runnable() {
+   @Override
+   public void run() {
+      output.setText("callback 3, param is: " + string0);
+   }
+};
+
+public float callback4(float param0) {
+   System.out.println("callback 4, param is: " + param0);
+   float0 = param0;
+   handler.post(callback4Thread);
+   return param0;
+}
+
+Runnable callback4Thread = new Runnable() {
+   @Override
+   public void run() {
+      output.setText("callback 4, param is: " + float0);
+   }
+};
+
+// [...]
+
+public native void init();
+public native void foo1();
+public native void foo2();
+
+static {
+   System.loadLibrary("tutorial2");
+}
+\end{lstlisting}
+At \refl{lst:tut2-java1}\textbf{:1-3} we declare three global variables where some callback values will be stored, and that will be accessed during some of the callbacks methods execution.\\
+Within the \keyword{onCreate} method we call the first out of three native methods, named \keyword{init()}: the corresponding native function initialises some parameters and retrieves the various \keyword{methodIDs}.\\
+Then callback methods declarations follow, at \refl{lst:tut2-java1}\textbf{:13-70}: for each callback method, there's a corresponding \keyword{Runnable} object which represents a command that can be executed, and is often used to run code in a different thread. This class declares an \keyword{abstract void} method, which therefore is mandatory to implement, and is the \keyword{run()} method: within this method we can put the active part of the code that must be executed and, typically, we use this to change the output view and display some values on the screen.\\
+Below (\refl{lst:tut2-java1}\textbf{:74-76}) there are the declarations of three \keyword{native} functions.\\
+Compared to the example we considered for the \textit{Tutorial1}, this native code is slightly more complex, and uses a thread and some JNI specific types we haven't had the chance to introduce before. To start, here we use the \keyword{JNI\_OnLoad} function (\refl{lst:tut2-c1}), which performs initialization operations for a given native library and returns the JNI version required by the native library. The virtual machine implementation calls \keyword{JNI\_OnLoad} when the native library is loaded, therefore we can use it to save a reference to the current Virtual Machine which - unlike the case of the \keyword{JNIEnv*} that is local to each call - lives along the whole life of the application.
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of tutorial2.c - JNI\_OnLoad,
+				   label=lst:tut2-c1]
+static JavaVM *gJavaVM;				   
+				   
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+  JNIEnv *env;
+  gJavaVM = vm;
+  LOGI("JNI_OnLoad called");
+  if ( (*vm)->GetEnv(vm, (void**) &env, JNI_VERSION_1_4)
+  		!= JNI_OK) {
+     LOGE("Failed to get the environment using GetEnv()");
+     return -1;
+  }
+  return JNI_VERSION_1_4;
+}
+\end{lstlisting}
+The \keyword{init()} function saves global references to the caller object and, hence, to the caller class the objects belongs to. Besides it saves the references to the \keyword{methodIDs} statically declared into the \keyword{callback\_t} structure (specifically defined for this example).\\
+In \refl{lst:tut2-c2} an extract of the structure declaration (\textbf{lines:1-15}), the global variables to save the global references to (\textbf{lines:17-18}), the same \keyword{GetMethodID} implementation we already saw (\textbf{line:35}) and the \keyword{NewGlobalRef()} function (\textbf{lines:26-28}), which creates a new global reference to the object referred to by the second argument. Global references must be explicitly disposed of by calling \keyword{DeleteGlobalRef}.\\
+Since \keyword{init()} native method is called within the \keyword{onCreate}, this whole procedure will be executed the first time we run the activity, and when we launch it again after having destroyed it.\\
+Now we can see what happens when the user calls \keyword{foo1}, and starts the testing routine.
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of tutorial2.c - init(),
+				   label=lst:tut2-c2]
+callback_t cb[] = {
+   // cb[0]
+   {
+     "callback1",
+     "()V",
+     JNI_WRAPPER_rVOID,
+   },
+   // cb[1]
+   {
+     "callback2",
+     "(IFLjava/lang/String;)I",
+     JNI_WRAPPER_rINT_p,
+   },
+   //[...]
+};
+
+static jobject gObject;
+static jclass gClass;
+
+void
+Java_com_android_tutorial2_Tutorial2Activity_init(
+				JNIEnv* env, jobject thiz)
+{
+   LOGI("init native function called");   
+   //[...]   
+   gObject = (jobject)(*env)->NewGlobalRef(env, thiz);
+   jclass clazz = (*env)->GetObjectClass(env, thiz);
+   gClass = (jclass)(*env)->NewGlobalRef(env, clazz);   
+   //[...]   
+   int i = sizeof cb / sizeof cb[0];
+   //[...]   
+   while(i--) {
+   	LOGI("Method %d is %s with signature %s", i,
+   			cb[i].cbName, cb[i].cbSignature);
+   	cb[i].cbMethod = (*env)->GetMethodID(env, clazz,
+   			cb[i].cbName, cb[i].cbSignature);
+   }
+}
+\end{lstlisting}
+\keyword{foo1} has no parameters, and its return value is void: its main code consists of a call to the function \keyword{daemonStart()}, therefore it's useless to show its code, though can be easily found on-line at the repository address. \keyword{daemonStart()}, in turn, creates a pthread and exits, and this is traditional C code, so far.\\
+The function that is launched as thread is called \keyword{randomCaller()}, and uses the \keyword{gJavaVM} variable to retrieve the current \keyword{JNIEnv} and send it as input parameter to another function, which is a wrapper that, depending on the input parameters, chooses which method has to be called. A sequence diagram to clarify its working is shown in \reff{fig:tut12-seq}.
+\begin{figure*}[t]
+ \includegraphics[width=17cm]{./figures/sequence.pdf}
+ \caption{Tutorial2 sequence diagram}
+ \label{fig:tut12-seq}
+\end{figure*}
+Unlike \textit{Tutorial1}, this example uses a thread, and there's a proper procedure to \textit{attach} the current thread to the JVM, as shown in \refl{lst:tut2-c3}.
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of tutorial2.c - thread attachment in randomCaller(),
+				   label=lst:tut2-c3]
+void *randomCaller() {
+   flag = 1;
+   JNIEnv *env;
+   int isAttached = 0;				   
+   int status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env,
+		JNI_VERSION_1_4);
+   if(status < 0) {
+      LOGE("callback_handler: failed to get JNI environment,
+      		assuming native thread");
+      status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env,
+      							NULL);
+      if(status < 0) {
+         LOGE("callback_handler: failed to attach current
+         	thread");
+      }
+   isAttached = 1;
+
+   /*
+   * callMethodWrapper(i++) 
+   * sleep(2);   
+   */
+   
+   if(isAttached)
+      (*gJavaVM)->DetachCurrentThread(gJavaVM);
+}
+\end{lstlisting}
+At \refl{lst:tut2-c3}\textbf{:5} is called the \keyword{GetEnv} function on the global reference of the JVM: this function sets \keyword{*env} to \keyword{NULL} if the current thread is not attached to the given virtual machine instance, and returns \keyword{JNI\_EDETACHED} which corresponds to \keyword{-2}; if the specified interface is not supported, it sets \keyword{*env} to \keyword{NULL}, and returns \keyword{JNI\_EVERSION} which corresponds to \keyword{-3}. Otherwise, sets \keyword{*env} to the appropriate interface, and returns \keyword{JNI\_OK}, which corresponds to \keyword{0}. Since we know we are running this code within a thread, the status value will be \keyword{-2}, and the thread attachment will be attempted (\refl{lst:tut2-c3}\textbf{:10}): the \keyword{AttachCurrentThread} function sets up the current native thread to run as part of a virtual machine instance. Once a thread is attached to the virtual machine instance, it can then make JNI function calls to perform such tasks as accessing objects and invoking methods. The \keyword{DetachCurrentThread} function (\refl{lst:tut2-c3}\textbf{:24}) informs a virtual machine instance that the current thread no longer needs to issue JNI function calls, allowing the virtual machine implementation to perform clean-ups and free resources.\\
+How the \keyword{switch} condition works inside the \keyword{randomCaller} is easy to understand (\refl{lst:tut2-c3}\textbf{:18-21}), hence the full code isn't presented in this paper, nonetheless it's important to stress the peculiarity of a calling method, which is the \keyword{call<Type>MethodA()} \refl{lst:tut2-c5}\textbf{:24}: to test this cycle, the \keyword{randomCaller} defines some variables, and calls the wrapper passing four arguments to it. An example about this can be seen in \refl{lst:tut2-c4}: at \textbf{line:11} the developer sets as input parameters the env variable, the ordinal number of the chosen callback method (\refl{lst:tut2-c2}\textbf{:9-13}), the array of native params (which is a \keyword{struct} we defined) and the size of this array.
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of tutorial2.c - method calls in randomCaller(),
+				   label=lst:tut2-c4]
+nvalue v1, v2, v3, npar[3];
+v1.type = INT;
+v1.i = 12;
+v2.type = FLOAT;
+v2.f = 2.3;
+v3.type = STRING;
+v3.s = "string";
+npar[0] = v1;
+npar[1] = v2;
+npar[2] = v3;
+callMethodWrapper(env, 1, npar, 3);
+\end{lstlisting}
+The \keyword{callMethodWrapper} function is partially shown in \refl{lst:tut2-c5}: the \keyword{for} at \textbf{line:7} maps all the native values to \keyword{jvalue[]}, which is a \keyword{struct} already defined for the JNI environment. It comes quite useful in this case because we can take advantage of the \keyword{call<Type>MethodA} function, where the \keyword{A} at the end of its name means that it takes as fourth parameter an \keyword{jvalue} array.
+
+\begin{figure*}[b]
+ \includegraphics[width=17cm]{./figures/tut2-scr1.png}
+ \caption{Tutorial2 running example}
+ \label{fig:tut2-scr1}
+\end{figure*}
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Part of tutorial2.c - callingMethodWrapper,
+				   label=lst:tut2-c5]
+int callMethodWrapper(JNIEnv* env, int mid, nvalue npar[],
+			int parSize) {
+   jvalue jpar[parSize];
+   //[ ... ]
+   if (parSize > 0) {
+   int i;
+   for (i=0; i<parSize; i++) {
+      switch (npar[i].type) {
+         case INT:
+            jpar[i].i = npar[i].i;
+         break;
+         case FLOAT:
+            jpar[i].f = npar[i].f;
+         break;
+         case STRING:
+            jpar[i].l = (*env)->NewStringUTF(env, npar[i].s);
+         break;
+      }
+   }
+}
+switch (cb[mid].jniWrapper) {
+   //[ ... ]
+   case JNI_WRAPPER_rINT_p:
+      (*env)->CallIntMethodA(env, gObject, cb[mid].cbMethod,
+      				jpar);
+   break;
+   //[ ... ]
+}
+\end{lstlisting}
+A screenshot of \textit{Tutorial2} activity and logcat during the execution can be found at \reff{fig:tut2-scr1}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Tutorial3}
-\label{sec:tutorial3}
-[Tutorial2, interaction Service - native thread, callback]
+\section{Java object handling within native code}
+It's possible that you would need to pass to the Java world a reference to an object that doesn't exist yet.\\
+We'll analyse how it's possible to find a class, create an instance of this class, and call some methods on it.\\
+Let's suppose we created a class, called Param, within the \keyword{tutorial2} package, which looks like the one in \refl{lst:tut2b-java1}
+\begin{lstlisting}[language=Java,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape,
+				   caption=Java class Param,
+				   label=lst:tut2b-java1]
+package com.android.tutorial2;
 
+public class Param {
+	private int[] iParams;
+	private float[] fParams;
+	private String[] sParams;
+
+	public Param(int[] iP, float[] fP, String[] sP) {
+		setiParams(iP);
+		setfParams(fP);
+		setsParams(sP);
+	}
+
+	public int[] getiParams() {
+		return iParams;
+	}
+	public void setiParams(int[] iParams) {
+		this.iParams = iParams;
+	}
+	public String[] getsParams() {
+		return sParams;
+	}
+	public void setsParams(String[] sParams) {
+		this.sParams = sParams;
+	}
+
+	public float[] getfParams() {
+		return fParams;
+	}
+	public void setfParams(float[] fParams) {
+		this.fParams = fParams;
+	}
+}
+\end{lstlisting}
+Suppose that we need to create a Param object, assign some values to its fields, and pass its reference to a Java method through the callback mechanism. Let's see the main steps to achieve this aim.\\
+To begin, we need to get a reference to the \keyword{Param} class, and we do this as follow:
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape]
+//Find the "Param" Class
+cls = (*env)->FindClass(env, "com/android/tutorial2/Param");
+\end{lstlisting}
+We can then create java arrays and, depending on the type of array we are going to create, we have to use a different constructor function, for instance, to create a \keyword{jint} array:
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape]
+int isize = 3;
+jint iparams[isize] = {0, 1, 2};
+//###Create a new Array of integers###
+iarr = (*env)->NewIntArray(env, isize);
+//Fill the array with the integer input parameter
+(*env)->SetIntArrayRegion(env, iarr, 0, isize, iparams);
+\end{lstlisting}
+Now the object \keyword{iarr} is a Java array of integers.\\
+The same thing can be done for floats, as follows:
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape]
+int fsize = 2;
+jfloat fparams[fsize] = {1.2, 3.2};
+//###Create a new Array of floats###
+farr = (*env)->NewIntArray(env, fsize);
+//Fill the array with the float input parameter
+(*env)->SetFloatArrayRegion(env, farr, 0, fsize, fparams);
+\end{lstlisting}
+Now, for the \keyword{String} we don't have any ready-to-use function to create an array of \keyword{String} objects, therefore we can use the more general \keyword{NewObjectArray} function, as follows:
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape]
+int ssize = 2;
+char* sparams[ssize] = {"ab","cd"};
+sarr = (*env)->NewObjectArray(
+		env, ssize, (*env)->FindClass(
+				env, "java/lang/String"), NULL);
+for (i=0; i<ssize; i++)
+   (*env)->SetObjectArrayElement(
+   		env, sarr, i, (*env)->NewStringUTF(
+   				env, sparams[i]));
+\end{lstlisting}
+Now, we have three Java arrays correctly initialised: we can create an object of the \keyword{Param} class, and use its constructor (\refl{lst:tut2b-java1}\textbf{:8}) to initialise it with these newly generated arrays:
+\begin{lstlisting}[language=C,
+				   columns=fullflexible,
+				   showstringspaces=false,
+				   xleftmargin=15pt,
+				   frame = l,
+				   numbers=left,
+				   commentstyle=\color{gray}\upshape]
+jmethodID constructor;
+//Find the constructor of the Param object, which takes as
+//parameter an int array and a float array
+constructor = (*env)->GetMethodID(env, cls, "<init>",
+		"([I[F[Ljava/lang/String;)V");
+//Create the Object with its constructor, and the arrays as
+//parameters
+obj = (*env)->NewObject(
+		env, cls, constructor, iarr, farr, sarr);
+//Call the callback method passing the object as input
+//parameter
+(*env)->CallStaticVoidMethod(
+		env, gClass, cb[id].cbMethod, obj);
+\end{lstlisting}
+As we saw in \refs{sec:tutorial1}, the following signature \keyword{"([I[F[Ljava/lang/String;)V"} indicates a method - in this case \keyword{<init>} identifies the constructor method - which has a \keyword{void} return, and has input structured like:
+\begin{itemize}
+\item \keyword{[I} -> array of integers: int[]
+\item \keyword{[F} -> array of floats: float[]
+\item \keyword{[Ljava/lang/String;} -> array of objects \keyword{L} indicates object, of type \keyword{java/lang/String}: String[]
+\end{itemize}
+Therefore this signature means \keyword{void <init> (int[], float[], String[])}, which is exactly how the \keyword{Param} constructor is defined at \refl{lst:tut2b-java1}\textbf{:8}.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusions}
@@ -233,6 +900,8 @@ repository at \url{https://github.com/thoeni/ndk-tutorials} or at \url{https://b
 % No cited references 
 \nocite{liang1999jni}
 \nocite{marakanajni}
+\nocite{learningandroid}
+\nocite{programmingandroid}
 
 % We suggest the use of JabRef for editing your bibliography file (Report.bib)
 \bibliographystyle{splncs}

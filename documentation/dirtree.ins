@@ -1,0 +1,37 @@
+%% `dirtree.ins.ins'
+%%
+%% Docstrip installation instruction file for docstyle `dirtree'
+%%
+%% Jean-C\^ome Charpentier <Jean-Come.Charpentier@wanadoo.fr> (jcc)
+%%
+%% January 25, 2006
+
+\def\batchfile{dirtree.ins}
+\input docstrip.tex
+\keepsilent
+\Msg{*** Generating the `dirtree' package ***}
+\askforoverwritefalse
+\generate{\file{dirtree.tex}{\from{dirtree.dtx}{tex}}}
+\generate{\file{dirtree.sty}{\from{dirtree.dtx}{latex-wrapper}}}
+%
+\ifToplevel{%
+\Msg{***********************************************************}
+\Msg{*}
+\Msg{* To finish the installation you have to move the files}
+\Msg{* dirtree.sty and dirtree.tex in a directory/folder searched by TeX.}
+\Msg{*}
+\Msg{* To produce the documentation, run the file `dirtree.dtx'}
+\Msg{* through LaTeX.}
+\Msg{*}
+\Msg{* If you require the commented code, desactivating the}
+\Msg{* OnlyDescription macro, you must recompile, execute:}
+\Msg{* `makeindex -s gind.ist dirtree'}
+\Msg{* `makeindex -s gglo.ist -o dirtree.gls dirtree.glo'}
+\Msg{* and recompile.}
+\Msg{*}
+\Msg{***********************************************************}
+}
+
+\endinput
+%% 
+%% End of file `dirtree.ins'
