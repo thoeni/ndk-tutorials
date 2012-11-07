@@ -109,20 +109,32 @@ public abstract class Tutorial3Service extends Service {
 	public void _callback1() {
 		callback1();
 		Log.i(TAG, "_callback1 called: broadcasting this information.");
+		Intent intent = new Intent("com.android.tutorial3.TUTORIAL_3_INTENT");
+		intent.putExtra("CALLBACK_EXEC",1);
+		sendBroadcast(intent);
 	}
 
 	public int _callback2 (int param0, float param1, String param2) {
 		Log.i(TAG, "_callback2 called: broadcasting this information.");
+		Intent intent = new Intent("com.android.tutorial3.TUTORIAL_3_INTENT");
+		intent.putExtra("CALLBACK_EXEC",2);
+		sendBroadcast(intent);
 		return callback2(param0, param1, param2);
 	}
 
 	public void _callback3(String param0) {
 		Log.i(TAG, "_callback3 called: broadcasting this information.");
 		callback3(param0);
+		Intent intent = new Intent("com.android.tutorial3.TUTORIAL_3_INTENT");
+		intent.putExtra("CALLBACK_EXEC",3);
+		sendBroadcast(intent);
 	}
 
 	public float _callback4(float param0) {
 		Log.i(TAG, "_callback4 called: broadcasting this information.");
+		Intent intent = new Intent("com.android.tutorial3.TUTORIAL_3_INTENT");
+		intent.putExtra("CALLBACK_EXEC",4);
+		sendBroadcast(intent);
 		return callback4(param0);
 	}
 
