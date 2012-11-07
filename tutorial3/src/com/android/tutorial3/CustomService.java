@@ -4,21 +4,18 @@ import android.util.Log;
 
 public class CustomService extends Tutorial3Service {
 
+	/*
+	 * The following part is mandatory and forces the user to properly set the
+	 * recipe.
+	 */
+
 	public CustomService() {
 		super(2);
 		// TODO Auto-generated constructor stub
 	}
 
 	static final String TAG = "CustomService";
-	
-	/*
-	 * The following part is mandatory to properly set the recipe. if the
-	 * developer doesn't, the service will assume 0 as default
-	 */
-//	static {
-//		Tutorial3Service.setRecipe(2);
-//	}
-	
+
 	@Override
 	public void callback1() {		
 		Log.d(TAG, "callback1() executed.");
@@ -26,7 +23,8 @@ public class CustomService extends Tutorial3Service {
 
 	@Override
 	public int callback2(int param0, float param1, String param2) {
-		Log.d(TAG, "callback2(int, float, String) executed: int "+param0+", float "+param1+", String "+param2);
+		Log.d(TAG, "callback2(int, float, String) executed: int "+param0+"," +
+				"float "+param1+", String "+param2);
 		return 0;
 	}
 

@@ -41,9 +41,9 @@ static jobject gObject;
 
 /*
  * The enum below is used to switch between the various callback functions.
- * Basically the callback will depend on the return type rTYPE and on the presence
- * or absence of parameters. In case of parameters presence, a proper jvalue array
- * will be used.
+ * Basically the callback will depend on the return type rTYPE and on the
+ * presence or absence of parameters. In case of parameters presence, a proper
+ * jvalue array will be used.
  */
 typedef enum {
   JNI_WRAPPER_rVOID = 0,
@@ -83,19 +83,19 @@ typedef struct {
 callback_t cb[] = {
   // cb[0]
   {
-    "callback1", "()V", JNI_WRAPPER_rVOID,
+    "_callback1", "()V", JNI_WRAPPER_rVOID,
   },
   // cb[1]
   {
-    "callback2", "(IFLjava/lang/String;)I", JNI_WRAPPER_rINT_p,
+    "_callback2", "(IFLjava/lang/String;)I", JNI_WRAPPER_rINT_p,
   },
   // cb[2]
   {
-	"callback3", "(Ljava/lang/String;)V", JNI_WRAPPER_rVOID_p,
+	"_callback3", "(Ljava/lang/String;)V", JNI_WRAPPER_rVOID_p,
   },
   // cb[3]
   {
-  	"callback4", "(F)F", JNI_WRAPPER_rFLOAT_p,
+  	"_callback4", "(F)F", JNI_WRAPPER_rFLOAT_p,
   },
 };
 
@@ -118,7 +118,8 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
  ********************************/
 
 void
-Java_com_android_tutorial3_Tutorial3Service_init( JNIEnv* env, jobject thiz, jint recipe )
+Java_com_android_tutorial3_Tutorial3Service_init( JNIEnv* env,
+		jobject thiz, jint recipe )
 {
 	LOGI("init native function called with recipe number %d", recipe);
 	int status;
@@ -132,8 +133,10 @@ Java_com_android_tutorial3_Tutorial3Service_init( JNIEnv* env, jobject thiz, jin
 	int i = sizeof cb / sizeof cb[0];
 	LOGI("getting methodIDs of %d configured callback methods", i);
 	while(i--) {
-		LOGI("Method %d is %s with signature %s", i, cb[i].cbName, cb[i].cbSignature);
-		cb[i].cbMethod = (*env)->GetMethodID(env, clazz, cb[i].cbName, cb[i].cbSignature);
+		LOGI("Method %d is %s with signature %s", i, cb[i].cbName,
+				cb[i].cbSignature);
+		cb[i].cbMethod = (*env)->GetMethodID(env, clazz, cb[i].cbName,
+				cb[i].cbSignature);
 		if(!cb[i].cbMethod) {
 			LOGE("callback_handler: failed to get method ID");
 		}
@@ -141,9 +144,10 @@ Java_com_android_tutorial3_Tutorial3Service_init( JNIEnv* env, jobject thiz, jin
 }
 
 /*
- * The callStaticMethodWrapper takes as input the int mid number which identifies
- * the callback method to be called, the nvalue npar[] array, which contains the
- * input parameters, if any, and the parSize which indicates the number of parameters
+ * The callStaticMethodWrapper takes as input the int mid number which
+ * identifies the callback method to be called, the nvalue npar[] array, which
+ * contains the input parameters, if any, and the parSize which indicates the
+ * number of parameters
  */
 
 int callMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
@@ -194,8 +198,8 @@ int callMethodWrapper(JNIEnv* env, int mid, nvalue npar[], int parSize) {
 }
 
 /*
- * The *randomCaller switches between four callback declared above, preparing the input
- * parameters needed by each call.
+ * The *randomCaller switches between four callback declared above, preparing
+ * the input parameters needed by each call.
  */
 
 void *randomCaller() {
@@ -204,7 +208,8 @@ void *randomCaller() {
 	int isAttached = 0;
 	int status = (*gJavaVM)->GetEnv(gJavaVM, (void **) &env, JNI_VERSION_1_4);
 	if(status < 0) {
-		LOGE("callback_handler: failed to get JNI environment, assuming native thread");
+		LOGE("callback_handler: failed to get JNI environment, assuming native"
+				"thread");
 		status = (*gJavaVM)->AttachCurrentThread(gJavaVM, &env, NULL);
 		if(status < 0) {
 			LOGE("callback_handler: failed to attach current thread");
@@ -262,13 +267,15 @@ void daemonStart() {
 }
 
 /*
- * We could have used the jobject below, to access to the view and to public non-static methods,
- * but the aim of this tutorial is to sumulate a native thread which can asynchronously interact
- * with the Java View, without necessarily being linked to the calling object.
+ * We could have used the jobject below, to access to the view and to public
+ * non-static methods, but the aim of this tutorial is to sumulate a native
+ * thread which can asynchronously interact with the Java View, without
+ * necessarily being linked to the calling object.
  */
 
 void
-Java_com_android_tutorial3_Tutorial3Activity_foo1( JNIEnv* env, jobject thiz)
+Java_com_android_tutorial3_Tutorial3Service_foo1( JNIEnv* env,
+		jobject thiz)
 {
 	daemonStart();
 }
@@ -279,7 +286,8 @@ void daemonStop() {
 }
 
 void
-Java_com_android_tutorial3_Tutorial3Activity_foo2( JNIEnv* env, jclass thiz )
+Java_com_android_tutorial3_Tutorial3Service_foo2( JNIEnv* env,
+		jclass thiz )
 {
 	daemonStop();
 }

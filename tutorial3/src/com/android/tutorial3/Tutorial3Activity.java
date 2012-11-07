@@ -17,9 +17,16 @@
 package com.android.tutorial3;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +41,13 @@ public class Tutorial3Activity extends Activity implements Runnable {
 	static float float0;
 	static String string0;
 
+	/** Messenger for communicating with the service. */
+    Messenger mService = null;
+
+    /** Flag indicating whether we have called bind on the service. */
+    boolean mBound;
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		super.setContentView(R.layout.main);
@@ -48,6 +62,24 @@ public class Tutorial3Activity extends Activity implements Runnable {
 	}
 
 	@Override
+	protected void onStart() {
+		super.onStart();
+		// Binding to the service
+        bindService(new Intent(this, CustomService.class), mConnection,
+            Context.BIND_AUTO_CREATE);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		// Unbinding from the service
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+	}
+
+	@Override
 	public void onPause() {
 		super.onPause();
 		handler.removeCallbacks(this);
@@ -55,24 +87,44 @@ public class Tutorial3Activity extends Activity implements Runnable {
 	}
 
 	public void button0(View v) {
-		foo1();
+		if (!mBound) return;
+		Message msg = Message.obtain(null, CustomService.MSG_RUN_FOO1, 0, 0);
+		try {
+			mService.send(msg);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void button1(View v) {
-		foo2();
+		if (!mBound) return;
+		Message msg = Message.obtain(null, CustomService.MSG_RUN_FOO2, 0, 0);
+		try {
+			mService.send(msg);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
-	/*
-	 * Native functions to start the daemon, and stop it.
-	 */
-
-	public native void foo1();
-
-	public native void foo2();
-
+	@Override
 	public void run() {
-		
 	}
+
+	/**
+	 * Class for interacting with the main interface of the service.
+	 */
+	private final ServiceConnection mConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(ComponentName className, IBinder service) {
+			mService = new Messenger(service);
+			mBound = true;
+		}
+		@Override
+		public void onServiceDisconnected(ComponentName className) {
+			mService = null;
+			mBound = false;
+		}
+	};
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

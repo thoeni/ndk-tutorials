@@ -2,11 +2,20 @@ package com.android.tutorial3;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
 import android.util.Log;
+import android.widget.Toast;
 
 public abstract class Tutorial3Service extends Service {
 	static final String TAG = "Tutorial3Service";
+
+	//******* Available messages to the Service *******
+	static final int MSG_RUN_FOO1= 1;
+	static final int MSG_RUN_FOO2 = 2;
+	//*************************************************
 
 	/*
 	 * recipe is 0 by default
@@ -14,10 +23,7 @@ public abstract class Tutorial3Service extends Service {
 	 * to define another recipe to initialize the library.
 	 */
 	int recipe = 0;
-//	static void setRecipe(int recipes){
-//		recipe = recipes;
-//	}
-//
+
 	protected Tutorial3Service(int recipe) {
 		this.recipe = recipe;
 	}
@@ -43,8 +49,37 @@ public abstract class Tutorial3Service extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return null;
+		return mMessenger.getBinder();
 	}
+
+	/**
+	 * Handler of incoming messages from clients.
+	 */
+	class IncomingHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case MSG_RUN_FOO1:
+				Toast.makeText(getApplicationContext(), "Calling foo1()!",
+						Toast.LENGTH_SHORT).show();
+				foo1();
+				break;
+			case MSG_RUN_FOO2:
+				Toast.makeText(getApplicationContext(), "Calling foo2()!",
+						Toast.LENGTH_SHORT).show();
+				foo2();
+				break;
+			default:
+				super.handleMessage(msg);
+			}
+		}
+	}
+
+	/* *
+	 * Instantiate the target - to be sent to clients - to communicate with
+	 * this instance of Service
+	 */
+	final Messenger mMessenger = new Messenger(new IncomingHandler());
 
 	/*
 	 * init(int recipe): initializes the environment, and sets the recipe
@@ -69,7 +104,27 @@ public abstract class Tutorial3Service extends Service {
 
 	abstract void callback3(String param0);
 
-	abstract float callback4(final float param0);
+	abstract float callback4(float param0);
+
+	public void _callback1() {
+		callback1();
+		Log.i(TAG, "_callback1 called: broadcasting this information.");
+	}
+
+	public int _callback2 (int param0, float param1, String param2) {
+		Log.i(TAG, "_callback2 called: broadcasting this information.");
+		return callback2(param0, param1, param2);
+	}
+
+	public void _callback3(String param0) {
+		Log.i(TAG, "_callback3 called: broadcasting this information.");
+		callback3(param0);
+	}
+
+	public float _callback4(float param0) {
+		Log.i(TAG, "_callback4 called: broadcasting this information.");
+		return callback4(param0);
+	}
 
 	/*
 	 * Load the native library
