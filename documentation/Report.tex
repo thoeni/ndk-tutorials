@@ -127,7 +127,7 @@
 \begin{document}
 
 % Please use capital letters in the beginning of important words as for example
-\begin{mytitle}A safari walk-through into JNI within Android\texttrademark \ OS\end{mytitle}
+\begin{mytitle}A safari walk-through to Android\texttrademark \ JNI borderline\end{mytitle}
 \begin{mysubtitle}
 Exploiting JNI capabilities taking advantage of Android\texttrademark \ NDK
 \end{mysubtitle}
@@ -222,7 +222,8 @@ Basically, to develop an "App" using the NDK, we need:
 \begin{itemize}
 \item Android SDK (\url{http://developer.android.com/sdk/index.html})
 \item Android NDK (\url{http://developer.android.com/tools/sdk/ndk/index.html})
-\item A source editor. Using Eclipse IDE for Java Developers automatises somehow the building process. (\url{http://www.eclipse.org/downloads/})
+\item A source editor. Using Eclipse IDE for Java Developers automatises somehow
+the building process. (\url{http://www.eclipse.org/downloads/})
 \end{itemize}
 From within the \textit{"SDK/tools"} directory, you can execute the \keyword{android} command, to launch the Android SDK Manager: from here, you can download Android API and Extras.\\
 The Eclipse version you've downloaded will be a plain version, not yet customised to deal with specific Android needs and options: you then need to set up Android Tools for Eclipse by clicking \textit{"Help -> Install new software"} and putting the url \url{https://dl-ssl.google.com/android/eclipse/}.\\
@@ -403,7 +404,7 @@ void Java_com_android_tutorial1_Tutorial1Activity_foo2(
    failure: return;
 }
 \end{lstlisting}
-The first thing that we can see is the \keyword{\#include <jni.h>} at line 1: this is the header file - included with the JDK - that maps Java types to their native counterparts.\\
+The first thing that we can see is the \keyword{\#include <jni.h>} at line 1: this is the header file - included with the JDK - that maps Java types to their native counterparts (\reft{table:types-correspondence}).\\
 There are two functions (line 14 and line 27): their names have a specific format which maps the full name of the "caller" Java class - where the \textit{underline} character replaces the typical Java \textit{dot notation} - and, at the end, there's the name of the function, which corresponds to the \keyword{native} method declared into our class.\\
 Let's take \keyword{foo1} as example: the method declaration in \refl{lst:tut1-java1}\textbf{:1} is natively implemented in \refl{lst:tut1-c1}\textbf{:14}. As it's done for the name, the input parameters and the return type have to match as well, therefore we have that the java \keyword{String} type is mapped to a native \keyword{jstring} type (thanks to the jni.h library that we included some lines above); the same goes for the input (\keyword{String/jstring} again), with a peculiarity: native functions mapped to Java methods through JNI paradigm always have two more parameters, a \keyword{JNIEnv*} which is a pointer to the current Java environment, and a \keyword{jobject} which is a reference to the caller object. Given this, depending on the variety of input(s) and of the output type, we're able to properly create the correct JNI function declaration: from now on, with some attentions, native code can freely run.\\
 In this tutorial I decided to pass a \keyword{String} as input to have the opportunity to show how the developer should proceed when she needs to handle variable types that are not primary ones. In this case, we have to explicitly convert the string from \keyword{jstring} to a \textit{"native-friendly"} \keyword{char*}: if you don't, the error is sometimes not as verbose as you would expect it to be, and it's quite hard to debug this situation, therefore pay attention to the Java/native types mismatch. As the reader can easily understand, we declare a native string, which will save the result of the right-hand side function (\refl{lst:tut1-c1}\textbf{:18}) \keyword{GetStringUTFChars} which obtains string characters represented in the Unicode format. The third parameter indicates whether we want a copy, or the pointer to the actual java string: in the latter case, the developer must pay attention not to modify the contents of the returned string. This parameter is typically set to NULL, and the JVM will autonomously determine the choice to pick.\\
@@ -421,8 +422,46 @@ The code in \refl{lst:tut1-c1}\textbf{:27-49} is easy to read, despite for a det
 \item \keyword{JNIEnv*}, the pointer to the Java environment
 \item \keyword{jobject}, the caller object, that we passed to the native function as input parameter
 \item \keyword{const char*}, the string which identifies the name of the method to call back
-\item \keyword{const char*}, the "signature" of the method, called the method descriptor: despite it could seem bizarre, it's very easy to understand. The first part, between the round brackets, represents the input parameters, and their types; the last identifier, after the closed round bracket, represents the return type. In our case, \keyword{()V} means \keyword{void foo3Callback()}. If our function was, let's say, \keyword{float foo3Callback(int i)} we would write, as its descriptor: \keyword{(I)F}. And, again, with \keyword{float foo3Callback(int i, float f, int j)} we would write \keyword{(IFI)F}. We will see how to declare complex descriptors, with strings, objects and arrays further
+\item \keyword{const char*}, the "signature" of the method, called the method descriptor: despite it could seem bizarre, it's very easy to understand. The first part, between the round brackets, represents the input parameters, and their types; the last identifier, after the closed round bracket, represents the return type. In our case, \keyword{()V} means \keyword{void foo3Callback()}. If our function was, let's say, \keyword{float foo3Callback(int i)} we would write, as its descriptor: \keyword{(I)F}. And, again, with \keyword{float foo3Callback(int i, float f, int j)} we would write \keyword{(IFI)F}. A guide table is given at \reft{table:types-correspondence}. We will see how to declare complex descriptors, with strings, objects and arrays further.
 \end{itemize}
+\vspace{1em}
+\begin{tablehere}
+	\centering
+	\renewcommand{\arraystretch}{1.2}	
+	\begin{tabular}{c l p{2cm}}
+		\hline
+		Signature & Java Type & Native Type \\
+		\hline
+		\texttt{Z} & \texttt{boolean} & \texttt{jboolean} \\
+		\texttt{B} & \texttt{byte} & \texttt{jbyte} \\
+		\texttt{C} & \texttt{char} & \texttt{jchar} \\
+		\texttt{S} & \texttt{short} & \texttt{jshort} \\
+		\texttt{I} & \texttt{int} & \texttt{jint} \\
+		\texttt{L} & \texttt{long} & \texttt{jlong} \\
+		\texttt{F} & \texttt{float} & \texttt{jfloat} \\
+		\texttt{D} & \texttt{double} & \texttt{jdouble} \\
+		\texttt{-} & \texttt{void} & \texttt{void} \\
+		\hline
+	\end{tabular}
+	\caption{Types correspondence Java/JNI and signatures}
+	\label{table:types-correspondence}
+\end{tablehere}
+\vspace{1em}
+Signature for object and arrays are:\\
+\vspace{1em}
+\begin{tablehere}
+	\centering
+	\renewcommand{\arraystretch}{1.2}	
+	\begin{tabular}{l l}
+		\hline
+		Signature & Java Type\\
+		\hline
+		\texttt{Lcom/qualified/class;} & \texttt{com-qualified-class}\\
+		\texttt{[type} & \texttt{type[]}\\
+		\hline
+	\end{tabular}
+\end{tablehere}
+
 We still miss the last step, which allows the Java class to load the shared native library: the native code needs to be compiled by the \keyword{ndk-build} command. Before doing this, we have to create the \keyword{Android.mk} into the \keyword{jni} directory. The content of this file, for this tutorial, is shown at \refl{lst:tut1-c2}: after defining the name of the module that will be compiled, its source file, and local libs that we want to use, through the \keyword{include \$(BUILD\_SHARED\_LIBRARY)} instruction, we tell the compiler to create the shared object. Doing so, this library will be available to be loaded by Java classes. The use of \keyword{ndk-build} command is highly suggested, since it will generate all the files and folders that our environment needs.
 
 \begin{lstlisting}[language=make,
@@ -705,7 +744,7 @@ callMethodWrapper(env, 1, npar, 3);
 \end{lstlisting}
 The \keyword{callMethodWrapper} function is partially shown in \refl{lst:tut2-c5}: the \keyword{for} at \textbf{line:7} maps all the native values to \keyword{jvalue[]}, which is a \keyword{struct} already defined for the JNI environment. It comes quite useful in this case because we can take advantage of the \keyword{call<Type>MethodA} function, where the \keyword{A} at the end of its name means that it takes as fourth parameter an \keyword{jvalue} array.
 
-\begin{figure*}[b]
+\begin{figure*}[t]
  \includegraphics[width=17cm]{./figures/tut2-scr1.png}
  \caption{Tutorial2 running example}
  \label{fig:tut2-scr1}
