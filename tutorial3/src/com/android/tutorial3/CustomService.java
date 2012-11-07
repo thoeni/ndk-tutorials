@@ -4,15 +4,20 @@ import android.util.Log;
 
 public class CustomService extends Tutorial3Service {
 
+	public CustomService() {
+		super(2);
+		// TODO Auto-generated constructor stub
+	}
+
 	static final String TAG = "CustomService";
 	
 	/*
 	 * The following part is mandatory to properly set the recipe. if the
 	 * developer doesn't, the service will assume 0 as default
 	 */
-	static {
-		Tutorial3Service.setRecipe(2);
-	}
+//	static {
+//		Tutorial3Service.setRecipe(2);
+//	}
 	
 	@Override
 	public void callback1() {		
