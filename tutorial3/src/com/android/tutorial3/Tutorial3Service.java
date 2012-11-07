@@ -32,7 +32,7 @@ public abstract class Tutorial3Service extends Service {
 	public void onCreate() {
 		Log.d(TAG, "onCreated");
 		super.onCreate();
-		init(recipe);
+		init("carbonara");
 	}
 
 	@Override
@@ -82,12 +82,12 @@ public abstract class Tutorial3Service extends Service {
 	final Messenger mMessenger = new Messenger(new IncomingHandler());
 
 	/*
-	 * init(int recipe): initializes the environment, and sets the recipe
+	 * init(String recipe): initializes the environment, and sets the recipe
 	 * foo1(): starts the sample daemon
 	 * foo2(): stops the sample daemon
 	 */
 
-	public native void init(int recipe);
+	public native void init(String recipe);
 
 	public native void foo1();
 

@@ -119,9 +119,10 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
 void
 Java_com_android_tutorial3_Tutorial3Service_init( JNIEnv* env,
-		jobject thiz, jint recipe )
+		jobject thiz, jstring recipe )
 {
-	LOGI("init native function called with recipe number %d", recipe);
+	const char *inputString = (*env)->GetStringUTFChars(env, recipe, 0);
+	LOGI("init native function called with recipe: %s", inputString);
 	int status;
 	int isAttached = 0;
 	gObject = (jobject)(*env)->NewGlobalRef(env, thiz);
