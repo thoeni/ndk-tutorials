@@ -127,10 +127,10 @@
 \begin{document}
 
 % Please use capital letters in the beginning of important words as for example
-\begin{mytitle}A safari walk-through to Android\texttrademark \ JNI borderline\end{mytitle}
-\begin{mysubtitle}
-Exploiting JNI capabilities taking advantage of Android\texttrademark \ NDK
-\end{mysubtitle}
+\begin{mytitle}A safari walk-through the Android\texttrademark \ JNI borderline\end{mytitle}
+%\begin{mysubtitle}
+%Exploiting JNI capabilities taking advantage of Android\texttrademark \ NDK
+%\end{mysubtitle}
 %
 % Please do not insert a line here
 %
@@ -140,7 +140,7 @@ Matr. 708267, (antonio.troina@mail.polimi.it)\\
 \hspace{10ex}
 \begin{flushright}
 \emph{Introductory report for the M.Sc. thesis in Computer Science Engineering}\\
-\emph{Reviser: PhD. Patrick Bellasi (bellasi@elet.polimi.it)}
+\emph{Supervisor: PhD. Patrick Bellasi (bellasi@elet.polimi.it)}
 \end{flushright}
 
 Last update: \today
@@ -310,7 +310,43 @@ The \keyword{@+id/button0} and the \keyword{@string/button0} are references to o
 <string name="button0">Call to native</string>
 \end{lstlisting}
 \end{itemize}
-These xml files will then be automatically built into an \keyword{R} object, visible to the activity, which will access to it and get views, and set values on its attributes.
+These xml files will then be automatically built into an \keyword{R} object, visible to the activity, which will access to it and get views, and set values on its attributes.\\
+When editing native JNI code in an Android project using the Android NDK you may
+configure \textbf{Eclipse} to automatically rebuild your project when editing native code,
+just as it does for java. Open your project \texttt{Properties}, then click \texttt{Builder} on the left hand side, and \texttt{New} on the right hand side. From the following dialog, choose \texttt{Program} and \texttt{OK}.\\
+In the \texttt{Main} tab, we fill the fields as follows:
+\begin{itemize}
+\item Name: \texttt{NDK Builder}
+\item \texttt{/opt/android-ndk/ndk-build} (or wherever your ndk-build binary is).
+\item Working Directory:\\
+\texttt{ \$ \{ workspace\_loc:/projectName \} } (Press the Browse Workspace... button to select it graphically)
+\end{itemize}
+Then we can switch to the second tab (\reff{fig:ndk-build-2}), \texttt{Refresh}: enable the option \texttt{"Refresh resources upon completion"} and click the button \texttt{Specify Resources...}: choose the \texttt{libs} directory within the workspace tree; be sure to check this folder only.
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=7cm]{./figures/ndk-build-2.png}
+ \caption{Refresh properties - Eclipse builder}
+ \label{fig:ndk-build-2}
+\end{figurehere}
+
+The last tab, named \texttt{Build Options} is shown in \reff{fig:ndk-build-3}: as done for the \texttt{Refresh} tab, check the last option, and choose \texttt{Specify Resources...}. Choose the \texttt{jni} directory within your workspace tree; be sure to check this folder only.
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=7cm]{./figures/ndk-build-3.png}
+ \caption{Build properties - Eclipse builder}
+ \label{fig:ndk-build-3}
+\end{figurehere}
+
+This being done, the result of a project build (\texttt{ctrl+B}) is shown in \reff{fig:ndk-build-4}.
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=7cm]{./figures/ndk-build-4.png}
+ \caption{Native building result, into Eclipse console}
+ \label{fig:ndk-build-4}
+\end{figurehere}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -426,8 +462,7 @@ The code in \refl{lst:tut1-c1}\textbf{:27-49} is easy to read, despite for a det
 \end{itemize}
 \vspace{1em}
 \begin{tablehere}
-	\centering
-	\renewcommand{\arraystretch}{1.2}	
+	\centering	
 	\begin{tabular}{c l p{2cm}}
 		\hline
 		Signature & Java Type & Native Type \\
@@ -451,7 +486,6 @@ Signature for object and arrays are:\\
 \vspace{1em}
 \begin{tablehere}
 	\centering
-	\renewcommand{\arraystretch}{1.2}	
 	\begin{tabular}{l l}
 		\hline
 		Signature & Java Type\\

@@ -78,11 +78,17 @@ public class Tutorial3Activity extends Activity implements Runnable {
 	@Override
 	protected void onStop() {
 		super.onStop();
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
 		// Unbinding from the service
         if (mBound) {
             unbindService(mConnection);
             mBound = false;
         }
+        unregisterReceiver(receiver);
 	}
 
 	@Override
