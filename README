@@ -8,7 +8,9 @@ Tutorial2: Contains an example to explore some possibilities of JNI callbacks
 Tutorial3: Contains an example where the native code calls back to an Android
 	   Service. In this example the Service called "Tutorial3Service" just
 	   loads the native shared library and permits a custom service which
-	   extends it to override callback methods.
+	   extends it to override callback methods. Furthermore, messenger and
+	   broadcast intents have been used to let the activity communicate
+	   with the CustomService.
 ###############################################################################
 
 The full package consists of 3 tutorials to explore JNI calls into Android
