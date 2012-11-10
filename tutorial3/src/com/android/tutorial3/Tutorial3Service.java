@@ -22,9 +22,9 @@ public abstract class Tutorial3Service extends Service {
 	 * The CustomService developer has to use the setRecipe in case he wants
 	 * to define another recipe to initialize the library.
 	 */
-	int recipe = 0;
+	String recipe = "default";
 
-	protected Tutorial3Service(int recipe) {
+	protected Tutorial3Service(String recipe) {
 		this.recipe = recipe;
 	}
 
@@ -32,7 +32,7 @@ public abstract class Tutorial3Service extends Service {
 	public void onCreate() {
 		Log.d(TAG, "onCreated");
 		super.onCreate();
-		init("carbonara");
+		init(recipe);
 	}
 
 	@Override
@@ -44,7 +44,7 @@ public abstract class Tutorial3Service extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		Log.d(TAG, "onDestroy");
+		Log.d(TAG, "onDestroyed");
 	}
 
 	@Override

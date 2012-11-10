@@ -971,9 +971,15 @@ For this tutorial, we apply all we've seen so far, adding some concepts that can
 let us taking advantage of the native code though some mechanisms which are
 typical of Android: we'll introduce a Service, and two different messaging
 systems, to enable a communication channel between the Activity and the Service.
-\\Doing so, we'll decouple the \keyword{View} and the \keyword{Controller}: the
+\\Doing so, we'll decouple the \keyword{View} (the activity) and the \keyword{Controller} (the service): the
 only interface to the Native environment will be the Service, and the Activity
-will be used only as a "trigger" for Java calls to Native, and as a "display" of calls coming from the Service (and, to it, from the Native).
+will be used only as a "trigger" for Java calls to Native, and as a "display" of calls coming from the Service (and, to it, from the Native). A sample sequence diagram of this tutorial can be found at \reff{fig:tut3-seq}
+
+\begin{figure*}[b]
+ \includegraphics[width=17cm]{./figures/sequence_t3.pdf}
+ \caption{Tutorial3 sequence diagram}
+ \label{fig:tut3-seq}
+\end{figure*}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

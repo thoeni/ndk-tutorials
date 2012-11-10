@@ -10,14 +10,14 @@ public class CustomService extends Tutorial3Service {
 	 */
 
 	public CustomService() {
-		super(2);
+		super("carbonara");
 		// TODO Auto-generated constructor stub
 	}
 
 	static final String TAG = "CustomService";
 
 	@Override
-	public void callback1() {		
+	public void callback1() {
 		Log.d(TAG, "callback1() executed.");
 	}
 
