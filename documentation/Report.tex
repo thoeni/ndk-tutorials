@@ -962,6 +962,19 @@ As we saw in \refs{sec:tutorial1}, the following signature \keyword{"([I[F[Ljava
 \item \keyword{[Ljava/lang/String;} -> array of objects \keyword{L} indicates object, of type \keyword{java/lang/String}: String[]
 \end{itemize}
 Therefore this signature means \keyword{void <init> (int[], float[], String[])}, which is exactly how the \keyword{Param} constructor is defined at \refl{lst:tut2b-java1}\textbf{:8}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tutorial3}
+
+For this tutorial, we apply all we've seen so far, adding some concepts that can
+let us taking advantage of the native code though some mechanisms which are
+typical of Android: we'll introduce a Service, and two different messaging
+systems, to enable a communication channel between the Activity and the Service.
+\\Doing so, we'll decouple the \keyword{View} and the \keyword{Controller}: the
+only interface to the Native environment will be the Service, and the Activity
+will be used only as a "trigger" for Java calls to Native, and as a "display" of calls coming from the Service (and, to it, from the Native).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusions}
