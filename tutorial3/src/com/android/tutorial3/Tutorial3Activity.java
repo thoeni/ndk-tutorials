@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -55,7 +56,7 @@ public class Tutorial3Activity extends Activity implements Runnable {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		super.setContentView(R.layout.main);
-		// Debug.startMethodTracing();
+		Debug.startMethodTracing();
 		handler = new Handler();
 		receiverFilter.addAction("com.android.tutorial3.TUTORIAL_3_INTENT");
 		registerReceiver(receiver, receiverFilter);
@@ -95,7 +96,7 @@ public class Tutorial3Activity extends Activity implements Runnable {
 	public void onPause() {
 		super.onPause();
 		handler.removeCallbacks(this);
-		// Debug.stopMethodTracing();
+		Debug.stopMethodTracing();
 	}
 
 	/* *
