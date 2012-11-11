@@ -52,9 +52,11 @@
 % Using Pictures and tables:
 % - Instead "table" write "tablehere" without parameters
 % - Instead "figure" write "figurehere " without parameters
-% - Please insert a blank line before and after \begin{figuerhere} ... \end{figurehere}
+% - Please insert a blank line before and after \begin{figuerhere} ...
+%\end{figurehere}
 %
-% CAUTION:   The first reference to a figure/table in the text should be formatted fat.
+% CAUTION:   The first reference to a figure/table in the text should be
+formatted fat.
 %
 
 \makeatletter
@@ -127,7 +129,9 @@
 \begin{document}
 
 % Please use capital letters in the beginning of important words as for example
-\begin{mytitle}A safari walk-through the Android\texttrademark \ JNI borderline\end{mytitle}
+\begin{mytitle}
+A safari walk-through the Android\texttrademark \ JNI borderline
+\end{mytitle}
 %\begin{mysubtitle}
 %Exploiting JNI capabilities taking advantage of Android\texttrademark \ NDK
 %\end{mysubtitle}
@@ -139,7 +143,8 @@ Antonio Troina\\
 Matr. 708267, (antonio.troina@mail.polimi.it)\\
 \hspace{10ex}
 \begin{flushright}
-\emph{Introductory report for the M.Sc. thesis in Computer Science Engineering}\\
+\emph{Introductory report for the M.Sc. thesis in Computer Science Engineering}
+\\
 \emph{Supervisor: PhD. Patrick Bellasi (bellasi@elet.polimi.it)}
 \end{flushright}
 
@@ -153,9 +158,9 @@ This article aims to briefly describe, in the form of some simple and annotated
 tutorials, how a developer can take advantage of some JNI capabilities under
 Android operating system to let the Java and Native environments communicate to
 each other. This operation has been made quite easy by the Android's native
-development kit (NDK). Special attention will be given to the callback mechanism, 
-which is by far the most complex, nevertheless the most challenging, under the
-developer's point of view.
+development kit (NDK). Special attention will be given to the callback
+mechanism, which is by far the most complex, nevertheless the most challenging,
+under the developer's point of view.
 
 \vspace{6ex}	% Please do not remove or reduce this space here.
 \begin{multicols}{2}
@@ -163,23 +168,23 @@ developer's point of view.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 The coming of Android in the smart-phones market would suggest that Java is
-definitely enough to rule this galaxy. Moreover, lately, the little-green-robot's
-operative system has approached, silently but firmly, to the embedded world
-which, typically, wasn't famous for being dominated by the Java language, 
-particularly for its performance-oriented needs. That being said, who's
-responsible for connecting the high-level Java application layer to the native
-world, and the other way around? Yes, this filling is JNI, which was initially
-released in early 1997. With JNI, the developer can achieve two main goals: 
-reusing his native code within a Java environment, and optimising the execution
-with regard to performances, so that intensive operations can run natively, 
-instead of being interpreted, as Java pattern requires - except for the peculiar
-case of the \textit{JIT-ed} code, where the bytecode is compiled \textit{Just In 
-Time} to run natively (this operation commonly runs at launch time, but can
-happen at install time, or at method invoke time).\\
+definitely enough to rule this galaxy. Moreover, lately, the
+little-green-robot's operative system has approached, silently but firmly, to
+the embedded world which, typically, wasn't famous for being dominated by the
+Java language, particularly for its performance-oriented needs. That being said,
+who's responsible for connecting the high-level Java application layer to the
+native world, and the other way around? Yes, this filling is JNI, which was
+initially released in early 1997. With JNI, the developer can achieve two main
+goals: reusing his native code within a Java environment, and optimising the
+execution with regard to performances, so that intensive operations can run
+natively, instead of being interpreted, as Java pattern requires - except for
+the peculiar case of the \textit{JIT-ed} code, where the bytecode is compiled
+\textit{Just In Time} to run natively (this operation commonly runs at launch
+time, but can happen at install time, or at method invoke time).\\
 So far, some basic examples are available (mainly on-line) which, however, are
 often more theoretical than practical, therefore this article is meant to be a
-concrete hands-on guide, to discover - some of - the secrets behind this powerful
-instrument which is JNI.
+concrete hands-on guide, to discover - some of - the secrets behind this
+powerful instrument which is JNI.
 
 %------------------------------------------------------------------------------
 \subsection{JNI, Android and NDK}
@@ -236,9 +241,9 @@ and putting the url \url{https://dl-ssl.google.com/android/eclipse/}.\\
 Once the environment is set up, we are ready to start developing our fist,
 small, application, which will interact with a native c-written library. Instead
 of editing the java source code, and the native code separately, and then
-compiling them as shown in \reff{fig:jni-flow}, Eclipse will just (automatically)
-build the Java part, while we'll manually generate the native shared library
-(we'll see how to automatise this procedure at the end of this article).\\
+compiling them as shown in \reff{fig:jni-flow}, Eclipse will just
+(automatically) build the Java part, while we'll manually generate the native shared library (we'll see how to automatise this procedure at the end of this
+article).\\
 The entirety of the files we'll work on (mainly, and at least two) is organised
 as shown below:
 
@@ -276,15 +281,15 @@ API 16, which correspond to Android Jelly Bean)
 human-readable application label, icons.
 \item \keyword{activity}: here we have the \keyword{android:name} full name of
 the activity (the java file), a \keyword{android:label} which is the name that
-will appear at the top of our running Activity, and the \keyword{<intent-filter>}
-node, which tells Android when this Activity should be run. Since our
-Tutorial1Activity will also be the one to be run after launch, we can declare
-this in the \keyword{<action>} node. When an App is called, Android looks for
-an activity that declares itself ready to resolve the \keyword{MAIN} action. In
-the second node, under the \keyword{<intent-filter>} node, we declare another
-attribute, which is \keyword{<category>}, where we specify that the category of
-our activity is \keyword{LAUNCHER}: this will allow the App to be launched from
-the Android desktop.
+will appear at the top of our running Activity, and the
+\keyword{<intent-filter>} node, which tells Android when this Activity should
+be run. Since our Tutorial1Activity will also be the one to be run after launch,
+we can declare this in the \keyword{<action>} node. When an App is called, 
+Android looks for an activity that declares itself ready to resolve the 
+\keyword{MAIN} action. In the second node, under the \keyword{<intent-filter>}
+node, we declare another attribute, which is \keyword{<category>}, where we
+specify that the category of our activity is \keyword{LAUNCHER}: this will
+allow the App to be launched from the Android desktop.
 \end{itemize}
 For the sake of clarity, the whole \keyword{AndroidManifest.xml} content is
 presented at \refl{lst:manifest-tut1}.
@@ -319,9 +324,9 @@ xmlns:android="http://schemas.android.com/apk/res/android"
 The \keyword{res} directory, contains, at least, the following subdirectories:
 \begin{itemize}
 \item \keyword{layout/}: This folder contains Android user interface XML files.
-\\Without going into detail too much, here we can find each visible element that
-composes what we see on the screen: strings, buttons, tables, text fields, menus.
-An example of a button declaration can be seen below
+\\Without going into detail too much, here we can find each visible element
+that composes what we see on the screen: strings, buttons, tables, text fields, 
+menus. An example of a button declaration can be seen below
 \begin{lstlisting}[language=XML,
 		   columns=fullflexible,
 		   showstringspaces=false,
@@ -359,13 +364,14 @@ hand side. From the following dialog, choose \texttt{Program} and \texttt{OK}.\\
 In the \texttt{Main} tab, we fill the fields as follows:
 \begin{itemize}
 \item Name: \texttt{NDK Builder}
-\item \texttt{/opt/android-ndk/ndk-build} (or wherever your ndk-build binary is).
+\item \texttt{/opt/android-ndk/ndk-build} (or wherever your ndk-build binary 
+is).
 \item Working Directory:\\
 \texttt{ \$ \{ workspace\_loc:/projectName \} } (Press the Browse Workspace... 
 button to select it graphically)
 \end{itemize}
-Then we can switch to the second tab (\reff{fig:ndk-build-2}), \texttt{Refresh}:
-enable the option \texttt{"Refresh resources upon completion"} and click the
+Then we can switch to the second tab (\reff{fig:ndk-build-2}), \texttt{Refresh}
+: enable the option \texttt{"Refresh resources upon completion"} and click the
 button \texttt{Specify Resources...}: choose the \texttt{libs} directory within
 the workspace tree; be sure to check this folder only.
 
