@@ -56,7 +56,7 @@
 %\end{figurehere}
 %
 % CAUTION:   The first reference to a figure/table in the text should be
-formatted fat.
+% formatted fat.
 %
 
 \makeatletter
@@ -881,7 +881,7 @@ static jclass gClass;
 void
 Java_com_android_tutorial2_Tutorial2Activity_init(
 				JNIEnv* env, jobject thiz)
-{
+
    LOGI("init native function called");   
    //[...]   
    gObject = (jobject)(*env)->NewGlobalRef(env, thiz);
@@ -1063,14 +1063,14 @@ class, and call some methods on it.\\
 Let's suppose we created a class, called Param, within the \keyword{tutorial2}
 package, which looks like the one in \refl{lst:tut2b-java1}
 \begin{lstlisting}[language=Java,
-				   columns=fullflexible,
-				   showstringspaces=false,
-				   xleftmargin=15pt,
-				   frame = l,
-				   numbers=left,
-				   commentstyle=\color{gray}\upshape,
-				   caption=Java class Param,
-				   label=lst:tut2b-java1]
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Java class Param,
+		   label=lst:tut2b-java1]
 package com.android.tutorial2;
 
 public class Param {
@@ -1111,12 +1111,12 @@ see the main steps to achieve this aim.\\
 To begin, we need to get a reference to the \keyword{Param} class, and we do
 this as follow:
 \begin{lstlisting}[language=C,
-				   columns=fullflexible,
-				   showstringspaces=false,
-				   xleftmargin=15pt,
-				   frame = l,
-				   numbers=left,
-				   commentstyle=\color{gray}\upshape]
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape]
 //Find the "Param" Class
 cls = (*env)->FindClass(env, "com/android/tutorial2/Param");
 \end{lstlisting}
@@ -1124,12 +1124,12 @@ We can then create java arrays and, depending on the type of array we are going
 to create, we have to use a different constructor function, for instance, to
 create a \keyword{jint} array:
 \begin{lstlisting}[language=C,
-				   columns=fullflexible,
-				   showstringspaces=false,
-				   xleftmargin=15pt,
-				   frame = l,
-				   numbers=left,
-				   commentstyle=\color{gray}\upshape]
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape]
 int isize = 3;
 jint iparams[isize] = {0, 1, 2};
 //###Create a new Array of integers###
@@ -1140,12 +1140,12 @@ iarr = (*env)->NewIntArray(env, isize);
 Now the object \keyword{iarr} is a Java array of integers.\\
 The same thing can be done for floats, as follows:
 \begin{lstlisting}[language=C,
-				   columns=fullflexible,
-				   showstringspaces=false,
-				   xleftmargin=15pt,
-				   frame = l,
-				   numbers=left,
-				   commentstyle=\color{gray}\upshape]
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape]
 int fsize = 2;
 jfloat fparams[fsize] = {1.2, 3.2};
 //###Create a new Array of floats###
@@ -1157,12 +1157,12 @@ Now, for the \keyword{String} we don't have any ready-to-use function to create
 an array of \keyword{String} objects, therefore we can use the more general
 \keyword{NewObjectArray} function, as follows:
 \begin{lstlisting}[language=C,
-				   columns=fullflexible,
-				   showstringspaces=false,
-				   xleftmargin=15pt,
-				   frame = l,
-				   numbers=left,
-				   commentstyle=\color{gray}\upshape]
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape]
 int ssize = 2;
 char* sparams[ssize] = {"ab","cd"};
 sarr = (*env)->NewObjectArray(
@@ -1178,12 +1178,12 @@ of the \keyword{Param} class, and use its constructor
 (\refl{lst:tut2b-java1}\textbf{:8}) to initialise it with these newly
 generated arrays:
 \begin{lstlisting}[language=C,
-				   columns=fullflexible,
-				   showstringspaces=false,
-				   xleftmargin=15pt,
-				   frame = l,
-				   numbers=left,
-				   commentstyle=\color{gray}\upshape]
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape]
 jmethodID constructor;
 //Find the constructor of the Param object, which takes as
 //parameter an int array and a float array
@@ -1217,7 +1217,7 @@ which is exactly how the \keyword{Param} constructor is defined at
 \section{Tutorial3}
 
 For this tutorial, we apply all we've seen so far, adding some concepts that can
-let us taking advantage of the native code though some mechanisms which are
+let us taking advantage of the native code through some mechanisms which are
 typical of Android: we'll introduce a Service, and two different messaging
 systems, to enable a communication channel between the Activity and the Service.
 \\Doing so, we'll decouple the \keyword{View} (the activity) and the 
@@ -1228,13 +1228,197 @@ calls to Native, and as a "display" of calls coming from the Service (and, to it
 \reff{fig:tut3-seq}: we'll refer to this figure often, to understand the
 structure of this application.
 
-\begin{figure*}[b]
+\begin{figure*}[t]
  \includegraphics[width=17cm]{./figures/sequence_t3.pdf}
  \caption{Tutorial3 sequence diagram}
  \label{fig:tut3-seq}
 \end{figure*}
 
+The activity, as one of its first tasks, will bind the service: this will also
+implicitly invoke the startService method, therefore this will be executed into
+the "onStart()" method. The service we are going to bind, is the "custom" one,
+which extends our own service, called \textit{Tutorial3Service} that loads the
+shared native library (in the same say we say for tutorial1 and tutorial2).\\
+When the service is created, typically, it calls an \texttt{"init()"} function,
+which initialises the shared library performing some actions, that we consider
+will be described into the Service class.\\
+Generally speaking, this tutorial, except for the service and the
+activity-service communication channel, it's exactly the same as the previous
+one. The native code is the same. This being said, let's analyse
+the high level part, how to implement a service, and hot to enable the
+communication between the activity and the service.\\
+Within the \keyword{AndroidManifest.xml} file, we have to explicitly declare
+that the application we are going to build will interface itself with a service
+, and we do this by adding the \refl{lst:tut3-manifest}\textbf{:8}:
+\begin{lstlisting}[language=xml,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=AndroidManifest.xml,
+		   label=lst:tut3-manifest]
+package com.android.tutorial3;
 
+<application android:label="Tutorial3"
+                 android:debuggable="true">
+	[...]
+	<activity ... >
+	[...]
+        </activity>
+        <service android:name=".CustomService"></service> 
+    </application>
+\end{lstlisting}
+
+Typically a Service is implemented to run in background mode, and to perform
+operations that don't need to appear on the foreground; a Service is run into
+the same thread as the Application one. After binding an Activity to a Service,
+the \keyword{onCreate()} and the \keyword{onStartCommand()} are called, the
+service is launched, and we're able to communicate with it.\\
+Let's see how to set the communication channel between the activity and the
+service up. Among the possible available methods, we chose two of them:
+
+\begin{itemize}
+\item the \keyword{Messenger} class to handle the Activity to Service
+communication
+\item the \keyword{Intent} class, and \keyword{sendBroadcast()} method to
+support the Service to Activity communication
+\end{itemize}
+
+In \refl{lst:tut3-service} the code to be added to implement the server side
+\keyword{Messenger} receiver and handler is shown.
+
+\begin{lstlisting}[language=Java,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Tutorial3Service.java - message handling,
+		   label=lst:tut3-service]
+//** Available messages to the Service ***
+static final int MSG_RUN_FOO1= 1;
+static final int MSG_RUN_FOO2 = 2;
+//****************************************
+
+/* *
+ * Instantiate the target - to be sent to clients - to
+ * communicate with this instance of Service
+ */
+final Messenger mMessenger = new Messenger(
+			new IncomingHandler());
+
+@Override
+public IBinder onBind(Intent intent) {
+	return mMessenger.getBinder();
+}
+
+/**
+ * Handler of incoming messages from clients.
+ */
+class IncomingHandler extends Handler {
+	@Override
+	public void handleMessage(Message msg) {
+		switch (msg.what) {
+		case MSG_RUN_FOO1:
+			Toast.makeText(getApplicationContext(),
+		"Calling foo1()!", Toast.LENGTH_SHORT).show();
+			foo1();
+			break;
+		case MSG_RUN_FOO2:
+			Toast.makeText(getApplicationContext(),
+		"Calling foo2()!", Toast.LENGTH_SHORT).show();
+			foo2();
+			break;
+		default:
+			super.handleMessage(msg);
+		}
+	}
+}
+\end{lstlisting}
+
+The \keyword{nMessenger} is the object the service will share with the activity.
+In \refl{lst:tut3-activity} the correspondent code from the \keyword{Activity} class, which allows it
+to interact with the service thanks to the \keyword{nMessenger} object.
+
+\begin{lstlisting}[language=Java,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Tutorial3Activity.java - message handling,
+		   label=lst:tut3-activity]
+/**
+ * Messenger for communicating with the service.
+ */
+Messenger mService = null;
+
+/** 
+ * Flag indicating whether we have called bind on
+ * the service. 
+ */
+boolean mBound;
+
+/**
+ * Class for interacting with the main interface
+ * of the service.
+ */
+private final ServiceConnection mConnection =
+		new ServiceConnection() {
+	@Override
+	public void onServiceConnected(
+			ComponentName className,
+			IBinder service) {
+		mService = new Messenger(service);
+		mBound = true;
+	}
+	@Override
+	public void onServiceDisconnected(
+			ComponentName className) {
+		mService = null;
+		mBound = false;
+	}
+};
+
+/* *
+ * Buttons interacts with the Service through
+ * Messenger paradigm.
+ */
+
+public void button0(View v) {
+	if (!mBound) return;
+	Message msg = Message.obtain(
+	null, CustomService.MSG_RUN_FOO1, 0, 0);
+	try {
+		mService.send(msg);
+	} catch (RemoteException e) {
+		e.printStackTrace();
+	}
+}
+
+public void button1(View v) {
+	if (!mBound) return;
+	Message msg = Message.obtain(
+	null, CustomService.MSG_RUN_FOO2, 0, 0);
+	try {
+		mService.send(msg);
+	} catch (RemoteException e) {
+		e.printStackTrace();
+	}
+}
+\end{lstlisting}
+
+As it's easy to infer, when the service is connected - within the
+\keyword{mConnection} - a new \keyword{Messenger} object is created (giving it
+as input the \keyword{IBinder service} interface. On this object, the activity
+will be able to call the \keyword{send(msg)} method, to send simple messages to
+the service below.
+
+From now on, the activity is ready to communicate with the Service
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
