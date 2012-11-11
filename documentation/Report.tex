@@ -34,6 +34,7 @@
 %\usepackage{draftwatermark}
 \SetWatermarkLightness{0.84}
 %\usepackage{paralist}
+\usepackage{float}
 
 \input{tcilatex}
 %-------------------------------------------------------------------------------
@@ -659,7 +660,6 @@ LOCAL_LDLIBS := -L$(SYSROOT)/usr/lib -llog
 
 include $(BUILD_SHARED_LIBRARY)
 \end{lstlisting}
-
 An example of the activity performing a callback can be found at
 \reff{fig:tut1-scr1}: the output visible at the top of the screen comes from the
 Java method at \refl{lst:tut1-java1}\textbf{:5}\\
@@ -909,7 +909,8 @@ send it as input parameter to another function, which is a wrapper that,
 depending on the input parameters, chooses which method has to be called. A
 sequence diagram to clarify its working is shown in \reff{fig:tut12-seq}.
 \begin{figure*}[t]
- \includegraphics[width=17cm]{./figures/sequence.pdf}
+\center
+ \includegraphics[width=15cm]{./figures/sequence.pdf}
  \caption{Tutorial2 sequence diagram}
  \label{fig:tut12-seq}
 \end{figure*}
@@ -1052,6 +1053,294 @@ switch (cb[mid].jniWrapper) {
 \end{lstlisting}
 A screenshot of \textit{Tutorial2} activity and logcat during the execution can
 be found at \reff{fig:tut2-scr1}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Tutorial3}
+
+For this tutorial, we apply all we've seen so far, adding some concepts that can
+let us taking advantage of the native code through some mechanisms which are
+typical of Android: we'll introduce a Service, and two different messaging
+systems, to enable a communication channel between the Activity and the Service.
+\\Doing so, we'll decouple the \keyword{View} (the activity) and the 
+\keyword{Controller} (the service): the only interface to the Native environment
+will be the Service, and the Activity will be used only as a "trigger" for Java
+calls to Native, and as a "display" of calls coming from the Service (and, to it
+, from the Native). A sample sequence diagram of this tutorial can be found at
+\reff{fig:tut3-seq}: we'll refer to this figure often, to understand the
+structure of this application.
+
+\begin{figure*}[t]
+ \includegraphics[width=17cm]{./figures/sequence_t3.pdf}
+ \caption{Tutorial3 sequence diagram}
+ \label{fig:tut3-seq}
+\end{figure*}
+
+The activity, as one of its first tasks, will bind the service: this will also
+implicitly invoke the startService method, therefore this will be executed into
+the "onStart()" method. The service we are going to bind, is the "custom" one,
+which extends our own service, called \textit{Tutorial3Service} that loads the
+shared native library (in the same say we say for tutorial1 and tutorial2).\\
+When the service is created, typically, it calls an \texttt{"init()"} function,
+which initialises the shared library performing some actions, that we consider
+will be described into the Service class.\\
+Generally speaking, this tutorial, except for the service and the
+activity-service communication channel, it's exactly the same as the previous
+one. The native code is the same. This being said, let's analyse
+the high level part, how to implement a service, and hot to enable the
+communication between the activity and the service.\\
+Within the \keyword{AndroidManifest.xml} file, we have to explicitly declare
+that the application we are going to build will interface itself with a service
+, and we do this by adding the \refl{lst:tut3-manifest}\textbf{:8}:
+\begin{lstlisting}[language=xml,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=AndroidManifest.xml,
+		   label=lst:tut3-manifest]
+package com.android.tutorial3;
+
+<application android:label="Tutorial3"
+                 android:debuggable="true">
+	[...]
+	<activity ... >
+	[...]
+        </activity>
+        <service android:name=".CustomService"></service> 
+    </application>
+\end{lstlisting}
+Typically a Service is implemented to run in background mode, and to perform
+operations that don't need to appear on the foreground; a Service is run into
+the same thread as the Application one. After binding an Activity to a Service,
+the \keyword{onCreate()} and the \keyword{onStartCommand()} are called, the
+service is launched, and we're able to communicate with it.\\
+Let's see how to set the communication channel between the activity and the
+service up. Among the possible available methods, we chose two of them:
+\begin{itemize}
+\item the \keyword{Messenger} class to handle the Activity to Service
+communication
+\item the \keyword{Intent} class, and \keyword{sendBroadcast()} method to
+support the Service to Activity communication
+\end{itemize}
+In \refl{lst:tut3-service} the code to be added to implement the server side
+\keyword{Messenger} receiver and handler is shown.
+\begin{lstlisting}[language=Java,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Tutorial3Service.java - message handling,
+		   label=lst:tut3-service]
+//** Available messages to the Service ***
+static final int MSG_RUN_FOO1= 1;
+static final int MSG_RUN_FOO2 = 2;
+//****************************************
+
+/* *
+ * Instantiate the target - to be sent to clients - to
+ * communicate with this instance of Service
+ */
+final Messenger mMessenger = new Messenger(
+			new IncomingHandler());
+
+@Override
+public IBinder onBind(Intent intent) {
+	return mMessenger.getBinder();
+}
+
+/**
+ * Handler of incoming messages from clients.
+ */
+class IncomingHandler extends Handler {
+	@Override
+	public void handleMessage(Message msg) {
+		switch (msg.what) {
+		case MSG_RUN_FOO1:
+			Toast.makeText(getApplicationContext(),
+		"Calling foo1()!", Toast.LENGTH_SHORT).show();
+			foo1();
+			break;
+		case MSG_RUN_FOO2:
+			Toast.makeText(getApplicationContext(),
+		"Calling foo2()!", Toast.LENGTH_SHORT).show();
+			foo2();
+			break;
+		default:
+			super.handleMessage(msg);
+		}
+	}
+}
+\end{lstlisting}
+The \keyword{nMessenger} is the object the service will share with the activity.
+In \refl{lst:tut3-activity} the correspondent code from the \keyword{Activity} class, which allows it
+to interact with the service thanks to the \keyword{nMessenger} object.
+
+\begin{lstlisting}[language=Java,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Tutorial3Activity.java - message handling,
+		   label=lst:tut3-activity]
+/**
+ * Messenger for communicating with the service.
+ */
+Messenger mService = null;
+
+/** 
+ * Flag indicating whether we have called bind on
+ * the service. 
+ */
+boolean mBound;
+
+/**
+ * Class for interacting with the main interface
+ * of the service.
+ */
+private final ServiceConnection mConnection =
+		new ServiceConnection() {
+	@Override
+	public void onServiceConnected(
+			ComponentName className,
+			IBinder service) {
+		mService = new Messenger(service);
+		mBound = true;
+	}
+	@Override
+	public void onServiceDisconnected(
+			ComponentName className) {
+		mService = null;
+		mBound = false;
+	}
+};
+
+/* *
+ * Buttons interacts with the Service through
+ * Messenger paradigm.
+ */
+
+public void button0(View v) {
+	if (!mBound) return;
+	Message msg = Message.obtain(
+	null, CustomService.MSG_RUN_FOO1, 0, 0);
+	try {
+		mService.send(msg);
+	} catch (RemoteException e) {
+		e.printStackTrace();
+	}
+}
+
+public void button1(View v) {
+	if (!mBound) return;
+	Message msg = Message.obtain(
+	null, CustomService.MSG_RUN_FOO2, 0, 0);
+	try {
+		mService.send(msg);
+	} catch (RemoteException e) {
+		e.printStackTrace();
+	}
+}
+\end{lstlisting}
+As it's easy to infer, when the service is connected - within the
+\keyword{mConnection} - a new \keyword{Messenger} object is created (giving it
+as input the \keyword{IBinder service} interface
+(\refl{lst:tut3-activity}\textbf{:22}). On this object, the activity will be
+able to call the \keyword{send(msg)} method, to send simple messages to the
+service beneath. Anytime the activity will send a message, the
+\keyword{handleMessage()} method will process the \keyword{what} attribute, and
+execute the proper branch of the \keyword{switch}. The main difference from the
+previous example lays in the service, which acts as a controller between
+activity and native code, while in \refs{sec:tutorial2} we had the activity
+loading and calling straight to the native library. From now on, the activity
+is ready to communicate with the Service\\
+So far we've seen how the activity can communicate with the service; the vice
+versa has been implemented - in this tutorial - taking advantage of the
+possibility into Android platform to broadcast some messages, which, in this
+case, are called \textit{Intents}. As done before, let's see the pieces of code
+which implement this functionality into the service class, and into the activity
+class, which are shown, respectively, in \refl{lst:tut3-service-broadcasting}
+and \refl{lst:tut3-activity-catching}.
+\begin{lstlisting}[language=Java,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Tutorial3Service.java - intent broadcasting,
+		   label=lst:tut3-service-broadcasting]
+public void _callback1() {
+	callback1();
+	Intent intent = new Intent(
+		"com.android.tutorial3.TUTORIAL_3_INTENT");
+	intent.putExtra("CALLBACK_EXEC",1);
+	sendBroadcast(intent);
+}
+\end{lstlisting}
+The Intent is created passing to the constructor a \keyword{String} which will
+be used to identify it, and listen to this specific intent, when broadcast; an
+extra parameter is put (in our example we use it to identify the callback method
+integer identifier), and the intent is then sent.
+\refl{lst:tut3-service-broadcasting}\textbf{:4-6}
+\begin{lstlisting}[language=Java,
+		   columns=fullflexible,
+		   showstringspaces=false,
+		   xleftmargin=15pt,
+		   frame = l,
+		   numbers=left,
+		   commentstyle=\color{gray}\upshape,
+		   caption=Tutorial3Activity.java - intent catching,
+		   label=lst:tut3-activity-catching]
+/**
+ * IntentFilter used to receive broadcast intents launched
+ * by service
+ */
+IntentFilter receiverFilter = new IntentFilter ();
+
+@Override
+public void onCreate(Bundle savedInstanceState) {
+	//[...]
+	receiverFilter.addAction(
+		"com.android.tutorial3.TUTORIAL_3_INTENT");
+	registerReceiver(receiver, receiverFilter);
+}
+
+/**
+ * Broadcast receiver: catches messages sent by the
+ * Tutorial3Service
+ */
+BroadcastReceiver receiver = new BroadcastReceiver() {
+	@Override
+	public void onReceive(
+          Context context, Intent intent) {
+	  int running = intent.getIntExtra("CALLBACK_EXEC", 0);
+	    switch (running) {
+	      case 1:
+	        Toast.makeText(
+		  getApplicationContext(),"Exec. callback1",
+		  Toast.LENGTH_SHORT).show();
+	      break;
+	      //[...]
+	    }
+	}
+};
+\end{lstlisting}
+An intent filter can be declared into the AndroidManifest or, at runtime, into
+the Activity. In our example, we chose the second option. At
+\refl{lst:tut3-activity-catching}\textbf{:10-12} the \keyword{IntentFilter} is
+initialised and it's registered to the \keyword{BroadcastReceiver} which is
+declared some lines beneath, at \refl{lst:tut3-activity-catching}\textbf{:19}.
+By overriding the \keyword{onReceive} method, we put the code which is run when
+the specific intent is caught. In this example we just throw a toast message on
+the screen.\\
+The native code is the same we already discussed in \refs{sec:tutorial2}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1211,214 +1500,6 @@ object, of type \keyword{java/lang/String}: String[]
 Therefore this signature means \keyword{void <init> (int[], float[], String[])},
 which is exactly how the \keyword{Param} constructor is defined at
 \refl{lst:tut2b-java1}\textbf{:8}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Tutorial3}
-
-For this tutorial, we apply all we've seen so far, adding some concepts that can
-let us taking advantage of the native code through some mechanisms which are
-typical of Android: we'll introduce a Service, and two different messaging
-systems, to enable a communication channel between the Activity and the Service.
-\\Doing so, we'll decouple the \keyword{View} (the activity) and the 
-\keyword{Controller} (the service): the only interface to the Native environment
-will be the Service, and the Activity will be used only as a "trigger" for Java
-calls to Native, and as a "display" of calls coming from the Service (and, to it
-, from the Native). A sample sequence diagram of this tutorial can be found at
-\reff{fig:tut3-seq}: we'll refer to this figure often, to understand the
-structure of this application.
-
-\begin{figure*}[t]
- \includegraphics[width=17cm]{./figures/sequence_t3.pdf}
- \caption{Tutorial3 sequence diagram}
- \label{fig:tut3-seq}
-\end{figure*}
-
-The activity, as one of its first tasks, will bind the service: this will also
-implicitly invoke the startService method, therefore this will be executed into
-the "onStart()" method. The service we are going to bind, is the "custom" one,
-which extends our own service, called \textit{Tutorial3Service} that loads the
-shared native library (in the same say we say for tutorial1 and tutorial2).\\
-When the service is created, typically, it calls an \texttt{"init()"} function,
-which initialises the shared library performing some actions, that we consider
-will be described into the Service class.\\
-Generally speaking, this tutorial, except for the service and the
-activity-service communication channel, it's exactly the same as the previous
-one. The native code is the same. This being said, let's analyse
-the high level part, how to implement a service, and hot to enable the
-communication between the activity and the service.\\
-Within the \keyword{AndroidManifest.xml} file, we have to explicitly declare
-that the application we are going to build will interface itself with a service
-, and we do this by adding the \refl{lst:tut3-manifest}\textbf{:8}:
-\begin{lstlisting}[language=xml,
-		   columns=fullflexible,
-		   showstringspaces=false,
-		   xleftmargin=15pt,
-		   frame = l,
-		   numbers=left,
-		   commentstyle=\color{gray}\upshape,
-		   caption=AndroidManifest.xml,
-		   label=lst:tut3-manifest]
-package com.android.tutorial3;
-
-<application android:label="Tutorial3"
-                 android:debuggable="true">
-	[...]
-	<activity ... >
-	[...]
-        </activity>
-        <service android:name=".CustomService"></service> 
-    </application>
-\end{lstlisting}
-
-Typically a Service is implemented to run in background mode, and to perform
-operations that don't need to appear on the foreground; a Service is run into
-the same thread as the Application one. After binding an Activity to a Service,
-the \keyword{onCreate()} and the \keyword{onStartCommand()} are called, the
-service is launched, and we're able to communicate with it.\\
-Let's see how to set the communication channel between the activity and the
-service up. Among the possible available methods, we chose two of them:
-
-\begin{itemize}
-\item the \keyword{Messenger} class to handle the Activity to Service
-communication
-\item the \keyword{Intent} class, and \keyword{sendBroadcast()} method to
-support the Service to Activity communication
-\end{itemize}
-
-In \refl{lst:tut3-service} the code to be added to implement the server side
-\keyword{Messenger} receiver and handler is shown.
-
-\begin{lstlisting}[language=Java,
-		   columns=fullflexible,
-		   showstringspaces=false,
-		   xleftmargin=15pt,
-		   frame = l,
-		   numbers=left,
-		   commentstyle=\color{gray}\upshape,
-		   caption=Tutorial3Service.java - message handling,
-		   label=lst:tut3-service]
-//** Available messages to the Service ***
-static final int MSG_RUN_FOO1= 1;
-static final int MSG_RUN_FOO2 = 2;
-//****************************************
-
-/* *
- * Instantiate the target - to be sent to clients - to
- * communicate with this instance of Service
- */
-final Messenger mMessenger = new Messenger(
-			new IncomingHandler());
-
-@Override
-public IBinder onBind(Intent intent) {
-	return mMessenger.getBinder();
-}
-
-/**
- * Handler of incoming messages from clients.
- */
-class IncomingHandler extends Handler {
-	@Override
-	public void handleMessage(Message msg) {
-		switch (msg.what) {
-		case MSG_RUN_FOO1:
-			Toast.makeText(getApplicationContext(),
-		"Calling foo1()!", Toast.LENGTH_SHORT).show();
-			foo1();
-			break;
-		case MSG_RUN_FOO2:
-			Toast.makeText(getApplicationContext(),
-		"Calling foo2()!", Toast.LENGTH_SHORT).show();
-			foo2();
-			break;
-		default:
-			super.handleMessage(msg);
-		}
-	}
-}
-\end{lstlisting}
-
-The \keyword{nMessenger} is the object the service will share with the activity.
-In \refl{lst:tut3-activity} the correspondent code from the \keyword{Activity} class, which allows it
-to interact with the service thanks to the \keyword{nMessenger} object.
-
-\begin{lstlisting}[language=Java,
-		   columns=fullflexible,
-		   showstringspaces=false,
-		   xleftmargin=15pt,
-		   frame = l,
-		   numbers=left,
-		   commentstyle=\color{gray}\upshape,
-		   caption=Tutorial3Activity.java - message handling,
-		   label=lst:tut3-activity]
-/**
- * Messenger for communicating with the service.
- */
-Messenger mService = null;
-
-/** 
- * Flag indicating whether we have called bind on
- * the service. 
- */
-boolean mBound;
-
-/**
- * Class for interacting with the main interface
- * of the service.
- */
-private final ServiceConnection mConnection =
-		new ServiceConnection() {
-	@Override
-	public void onServiceConnected(
-			ComponentName className,
-			IBinder service) {
-		mService = new Messenger(service);
-		mBound = true;
-	}
-	@Override
-	public void onServiceDisconnected(
-			ComponentName className) {
-		mService = null;
-		mBound = false;
-	}
-};
-
-/* *
- * Buttons interacts with the Service through
- * Messenger paradigm.
- */
-
-public void button0(View v) {
-	if (!mBound) return;
-	Message msg = Message.obtain(
-	null, CustomService.MSG_RUN_FOO1, 0, 0);
-	try {
-		mService.send(msg);
-	} catch (RemoteException e) {
-		e.printStackTrace();
-	}
-}
-
-public void button1(View v) {
-	if (!mBound) return;
-	Message msg = Message.obtain(
-	null, CustomService.MSG_RUN_FOO2, 0, 0);
-	try {
-		mService.send(msg);
-	} catch (RemoteException e) {
-		e.printStackTrace();
-	}
-}
-\end{lstlisting}
-
-As it's easy to infer, when the service is connected - within the
-\keyword{mConnection} - a new \keyword{Messenger} object is created (giving it
-as input the \keyword{IBinder service} interface. On this object, the activity
-will be able to call the \keyword{send(msg)} method, to send simple messages to
-the service below.
-
-From now on, the activity is ready to communicate with the Service
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

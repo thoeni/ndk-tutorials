@@ -269,15 +269,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="206.3167"
+     inkscape:cx="162.12253"
      inkscape:cy="141.43481"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1920"
-     inkscape:window-height="1005"
+     inkscape:window-width="1680"
+     inkscape:window-height="1025"
      inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-y="30"
      inkscape:window-maximized="1"
      fit-margin-left="10"
      fit-margin-right="10"
@@ -354,7 +354,7 @@
          style="font-size:9px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Droid Sans;-inkscape-font-specification:Droid Sans">callMethodWrapper(</flowPara><flowPara
          style="font-size:9px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
          id="flowPara4278">JNIEnv*, int , nvalue[], int)</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker3927)"
        d="m 158.68996,72.070052 133.20096,0"
        id="path4363"
        inkscape:connector-curvature="0" />
@@ -372,7 +372,7 @@
            style="fill:#008000" /></flowRegion><flowPara
          id="flowPara4560"
          style="font-size:7px;fill:#008000">pthread_create(...)</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#Arrow1Lend)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker3927)"
        d="m 292.396,96.41524 -132.82998,0"
        id="path4778"
        inkscape:connector-curvature="0" />
@@ -390,7 +390,7 @@
            style="fill:#ff0000" /></flowRegion><flowPara
          id="flowPara4560-7"
          style="font-size:7px;fill:#ff0000">return</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker3927);stroke-miterlimit:4;stroke-dasharray:none"
        d="m 292.90108,85.707111 171.22085,0"
        id="path4562"
        inkscape:connector-curvature="0" />
@@ -421,7 +421,7 @@
            style="fill:#000080" /></flowRegion><flowPara
          id="flowPara4560-0-7"
          style="font-size:7px;fill:#000080">call&lt;Type&gt;Method[A]( ... )</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:0.99258304px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       style="fill:none;stroke:#000000;stroke-width:0.99258303999999997px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker3927)"
        d="m 463.61686,126.6792 -168.6904,0"
        id="path5414"
        inkscape:connector-curvature="0" />
@@ -439,7 +439,7 @@
            style="fill:#ff0000" /></flowRegion><flowPara
          id="flowPara4560-7-8"
          style="font-size:7px;fill:#ff0000">return</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#008000;stroke-width:1.32299995;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:3.969, 3.969;stroke-dashoffset:0"
+       style="fill:none;stroke:#008000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
        d="m 294.16377,85.707111 0,143.747869"
        id="path5632"
        inkscape:connector-curvature="0" />
@@ -475,7 +475,7 @@
            style="fill:#d40000" /></flowRegion><flowPara
          id="flowPara5658-9"
          style="font-size:6px;fill:#d40000">flag=0</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker3927);stroke-miterlimit:4;stroke-dasharray:none"
        d="m 292.90108,166.22121 171.22085,0"
        id="path4562-6"
        inkscape:connector-curvature="0" />
@@ -506,7 +506,7 @@
            style="fill:#000080" /></flowRegion><flowPara
          id="flowPara4560-0-7-8"
          style="font-size:7px;fill:#000080">call&lt;Type&gt;Method[A]( ... )</flowPara></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:0.99258304px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#Arrow1Lend)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker3927);stroke-miterlimit:4;stroke-dasharray:none"
        d="m 463.79543,207.28259 -168.6904,0"
        id="path5414-1"
        inkscape:connector-curvature="0" />
@@ -583,12 +583,12 @@
          id="flowPara4278-1">Tutorial2Activity</flowPara><flowPara
          style="font-size:9px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Droid Sans;-inkscape-font-specification:Droid Sans"
          id="flowPara4024" /></flowRoot>    <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker5751)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker3927);stroke-miterlimit:4;stroke-dasharray:none"
        d="m 463.93141,114.60459 -386.383349,0"
        id="path4026"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker5751)"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-end:url(#marker3927);stroke-miterlimit:4;stroke-dasharray:none"
        d="m 464.42887,183.92766 -386.383347,0"
        id="path4026-6"
        inkscape:connector-curvature="0" />
@@ -633,7 +633,7 @@
            height="49.642857"
            x="24.107143"
            y="230.13007" /></flowRegion><flowPara
-         id="flowPara3113"></flowPara></flowRoot>    <flowRoot
+         id="flowPara3113" /></flowRoot>    <flowRoot
        xml:space="preserve"
        id="flowRoot4283-4-6"
        style="font-size:8px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#333333;fill-opacity:1;stroke:none;font-family:Sans"
