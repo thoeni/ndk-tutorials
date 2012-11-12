@@ -1340,7 +1340,41 @@ declared some lines beneath, at \refl{lst:tut3-activity-catching}\textbf{:19}.
 By overriding the \keyword{onReceive} method, we put the code which is run when
 the specific intent is caught. In this example we just throw a toast message on
 the screen.\\
-The native code is the same we already discussed in \refs{sec:tutorial2}.
+The native code is the same we already discussed in \refs{sec:tutorial2}.\\
+In \textbf{Figures from \ref{fig:tut3-traceview00} to
+\ref{fig:tut3-traceview03}} is shown the \textit{traceview} log of the first
+call to \keyword{foo1()} from the \keyword{button0}, which sends a message of
+the class \keyword{Messenger} to the \keyword{Tutorial3Service} which, in turn,
+calls the corresponding native function to spawn a thread, that then performs
+the callbacks.
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=6cm]{./figures/traceview00.png}
+ \caption{Messenger class connected to Button0}
+ \label{fig:tut3-traceview00}
+\end{figurehere}
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=6cm]{./figures/traceview01.png}
+ \caption{Binder process handling the Message}
+ \label{fig:tut3-traceview01}
+\end{figurehere}
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=6cm]{./figures/traceview02.png}
+ \caption{IncomingHandler asked to call foo1 ()V on Tutorial3Service}
+ \label{fig:tut3-traceview02}
+\end{figurehere}
+
+\begin{figurehere}
+ \centering
+ \includegraphics[width=6cm]{./figures/traceview03.png}
+ \caption{Thread triggered by service performs \_callback1 ()V}
+ \label{fig:tut3-traceview03}
+\end{figurehere}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1504,7 +1538,17 @@ which is exactly how the \keyword{Param} constructor is defined at
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Conclusions}
-
+In this short tutorial we analysed, through three convenient examples, the
+basics of jni development under Android, using the NDK development kit which
+comes with Android. JNI offers developers a powerful way to reuse their existing
+native code, or to implement critical and performance efficient functions in
+native code, that can be accessed by the Java environment. Furthermore, it
+allows native developers to access to the Java code, just within the C/C++
+source; it's possible to access methods, objects, and to create new instances of
+Java classes, and pass them by reference to Java methods. All this comes very
+useful within embedded systems, which typically already run native applications
+and algorithms that, if properly adapted, can be efficiently used also in the
+Android operative system.\\
 This report and all the source code are publicly available through the git
 repository at \url{https://github.com/thoeni/ndk-tutorials} or at
 \url{https://bitbucket.org/atroina/ndk-tutorials}.
